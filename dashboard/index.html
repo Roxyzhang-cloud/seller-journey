@@ -1353,12 +1353,21 @@ let activeStage = 's1';
 function switchTab(name) {
   activeStage = name;
   ['s1','s2','s3'].forEach(function(t) {
-    document.getElementById('tab-'+t).classList.add('hidden');
-    document.getElementById('btn-'+t).className =
+    // tracker panels use "tk-tab-" prefix; SOP panels use "sp-tab-" prefix
+    var tk = document.getElementById('tk-tab-'+t);
+    if (tk) tk.classList.add('hidden');
+    var sp = document.getElementById('sp-tab-'+t);
+    if (sp) sp.classList.add('hidden');
+    var btn = document.getElementById('btn-'+t);
+    if (btn) btn.className =
       'tracker-tab px-5 py-2.5 text-sm font-semibold bg-white text-gray-500 border border-gray-300 border-l-0';
   });
-  document.getElementById('tab-'+name).classList.remove('hidden');
-  document.getElementById('btn-'+name).className =
+  var tkActive = document.getElementById('tk-tab-'+name);
+  if (tkActive) tkActive.classList.remove('hidden');
+  var spActive = document.getElementById('sp-tab-'+name);
+  if (spActive) spActive.classList.remove('hidden');
+  var btnActive = document.getElementById('btn-'+name);
+  if (btnActive) btnActive.className =
     'tracker-tab px-5 py-2.5 text-sm font-semibold bg-[#0053e2] text-white border border-[#0053e2]';
   document.getElementById('btn-s1').classList.add('rounded-tl-xl');
   document.getElementById('btn-s3').classList.add('rounded-tr-xl');
