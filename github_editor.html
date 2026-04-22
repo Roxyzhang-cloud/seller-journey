@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seller Journey 在线编辑器</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .tab-on  { border-bottom:3px solid #0053e2; color:#0053e2; font-weight:700; }
+  .tab-off { border-bottom:3px solid transparent; color:#6b7280; }
+  .tab-off:hover { color:#0053e2; }
+  input[type=text],input[type=date],select,textarea {
+    border:1px solid #d1d5db; border-radius:6px;
+    padding:3px 6px; font-size:12px; width:100%; box-sizing:border-box;
+  }
+  input:focus,select:focus,textarea:focus {
+    outline:none; border-color:#0053e2; box-shadow:0 0 0 2px #dbeafe;
+  }
+  td { vertical-align:top; padding:4px 6px; }
+  tr:hover td { background:#f0f7ff; }
+  .sticky-col { position:sticky; left:0; background:white; z-index:1; border-right:2px solid #e5e7eb; }
+  tr:hover .sticky-col { background:#f0f7ff; }
+  .changed-row td { background:#fefce8 !important; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans text-sm">
+
+<!-- HEADER -->
+<header class="bg-[#0053e2] text-white px-5 py-3 flex items-center gap-3 shadow sticky top-0 z-50">
+  <span class="text-2xl">🐾</span>
+  <div>
+    <h1 class="text-base font-bold leading-tight">Seller Journey 在线编辑器</h1>
+    <p class="text-xs text-blue-200">编辑后自动推送到 GitHub → 触发 Actions 刷新 Dashboard</p>
+  </div>
+  <div class="ml-auto flex items-center gap-2">
+    <span id="hd-status" class="text-xs bg-white/20 px-2 py-1 rounded-full">未连接</span>
+    <button onclick="showCfg()" class="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full">⚙️ 设置</button>
+    <button id="btn-save" onclick="saveAll()" disabled
+      class="text-xs bg-[#ffc220] hover:bg-yellow-400 text-gray-900 font-bold px-4 py-1.5 rounded-full disabled:opacity-40 disabled:cursor-not-allowed">
+      💾 保存到 GitHub
+    </button>
+  </div>
+</header>
+
+<!-- CONFIG MODAL -->
+<div id="cfg-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded-xl shadow-xl p-8 w-full max-w-md">
+    <h2 class="text-lg font-bold mb-1">🔑 GitHub 连接设置</h2>
+    <p class="text-xs text-gray-400 mb-5">信息存在浏览器本地，不会上传到任何服务器</p>
+    <div class="space-y-4">
+      <div>
+        <label class="text-xs font-medium text-gray-600">GitHub Repo Owner</label>
+        <input id="cfg-owner" type="text" placeholder="Roxyzhang-cloud">
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600">Repo 名称</label>
+        <input id="cfg-repo" type="text" placeholder="seller-journey">
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600">GitHub PAT Token
+          <span class="text-gray-400 font-normal">(需要 repo 权限)</span>
+        </label>
+        <input id="cfg-token" type="password" placeholder="ghp_xxxxxxxxxxxx">
+        <p class="text-xs text-gray-400 mt-1">
+          创建地址: github.com → Settings → Developer settings → Tokens → 勾选 <b>repo</b>
+        </p>
+      </div>
+    </div>
+    <div class="flex gap-3 mt-6">
+      <button onclick="saveCfg()" class="flex-1 bg-[#0053e2] hover:bg-blue-700 text-white font-bold py-2 rounded-lg">连接</button>
+      <button onclick="closeCfg()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50">取消</button>
+    </div>
+    <p id="cfg-err" class="text-red-500 text-xs mt-3 hidden"></p>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+  <div id="toast-body" class="bg-gray-900 text-white text-sm px-5 py-3 rounded-xl shadow-lg"></div>
+</div>
+
+<!-- MAIN -->
+<div id="app" class="hidden">
+  <!-- Tab bar + filter -->
+  <div class="bg-white border-b px-5 flex items-center gap-0 sticky top-14 z-40">
+    <button class="tab-on px-4 py-3 text-sm" onclick="switchTab('s1',this)">S1 Drive-to-Launch</button>
+    <button class="tab-off px-4 py-3 text-sm" onclick="switchTab('s2',this)">S2 Cold Start</button>
+    <button class="tab-off px-4 py-3 text-sm" onclick="switchTab('s3',this)">S3 Quality</button>
+    <div class="ml-auto flex items-center gap-2 py-2">
+      <input id="search" type="text" placeholder="搜索 公司/BD/PID..." oninput="renderTable()"
+        class="border border-gray-300 rounded-lg px-3 py-1 text-xs w-48 focus:outline-none focus:border-blue-400">
+      <span id="change-badge" class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full hidden"></span>
+    </div>
+  </div>
+  <!-- Table container -->
+  <div class="overflow-auto" style="max-height:calc(100vh - 112px)">
+    <table id="tbl" class="w-full border-collapse bg-white text-xs"></table>
+  </div>
+</div>
+
+<!-- EMPTY STATE -->
+<div id="empty" class="flex flex-col items-center justify-center h-64 text-gray-400">
+  <div class="text-5xl mb-3">🐾</div>
+  <p class="font-medium">请先配置 GitHub 连接</p>
+  <button onclick="showCfg()" class="mt-4 bg-[#0053e2] text-white text-sm px-5 py-2 rounded-lg">点这里设置</button>
+</div>
+
+<script>
+// ── 配置 ────────────────────────────────────────────
+const CFG_KEY = 'sj_github_cfg';
+let cfg = {};
+let allData = { s1:[], s2:[], s3:[] };   // parsed CSV rows
+let fileShas = {};                         // {s1: sha, s2: sha, s3: sha}
+let changed  = new Set();                 // row keys that were edited
+let curTab   = 's1';
+
+// Columns to display per tab: [key, label, editable?, type]
+const COLS = {
+  s1: [
+    ['company','\u516c\u53f8',false],['pid','PID',false],['bd_manager','BD',false],['bd_stage','\u9636\u6bb5',true,'select:Identify|Business Case|Business Review|Contract|Onboarding|Done'],
+    ['sub_stage','Sub-stage',true,'text'],['contacted','\u662f\u5426\u8054\u7cfb',true,'select:Y|N|No Answer|Later'],
+    ['last_contact','\u6700\u540e\u8054\u7cfb\u65e5',true,'date'],['attempt_count','\u5c1d\u8bd5\u6b21\u6570',true,'text'],
+    ['notes','\u5907\u6ce8',true,'text'],['next_action_date','Next Action \u65e5\u671f',true,'date'],['next_action','Next Action',true,'text'],
+  ],
+  s2: [
+    ['company','\u516c\u53f8',false],['pid','PID',false],['bd_manager','BD',false],['call_priority','\u4f18\u5148\u7ea7',false],
+    ['contacted','\u662f\u5426\u8054\u7cfb',true,'select:Y|N|No Answer|Later'],
+    ['last_contact','\u6700\u540e\u8054\u7cfb\u65e5',true,'date'],['attempt_count','\u5c1d\u8bd5',true,'text'],
+    ['blocker','Blocker',true,'text'],['notes','\u5907\u6ce8',true,'text'],
+    ['next_action_date','Next Action \u65e5\u671f',true,'date'],['next_action','Next Action',true,'text'],
+  ],
+  s3: [
+    ['company','\u516c\u53f8',false],['pid','PID',false],['bd_owner','BD Owner',false],['quality_type','\u7c7b\u578b',false],
+    ['remediation_status','\u4fee\u590d\u72b6\u6001',true,'select:\u5f85\u5904\u7406|\u8fdb\u884c\u4e2d|\u5df2\u6062\u590d|\u65e0\u6cd5\u6062\u590d'],
+    ['contacted','\u662f\u5426\u8054\u7cfb',true,'select:Y|N|No Answer'],
+    ['last_contact','\u6700\u540e\u8054\u7cfb\u65e5',true,'date'],['poa_date','POA \u65e5\u671f',true,'date'],
+    ['latest_status','\u6700\u65b0\u72b6\u6001',true,'text'],['notes','\u5907\u6ce8',true,'text'],
+  ],
+};
+
+// ── CSV 解\u6790 ──────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.replace(/\r/g,'').split('\n').filter(Boolean);
+  if (!lines.length) return [];
+  const headers = splitCSVLine(lines[0]);
+  return lines.slice(1).map((line,i) => {
+    const vals = splitCSVLine(line);
+    const obj = { __row: i };
+    headers.forEach((h,j) => obj[h] = (vals[j] ?? '').trim());
+    return obj;
+  });
+}
+
+function splitCSVLine(line) {
+  const result = []; let cur = ''; let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+    else { cur += c; }
+  }
+  result.push(cur); return result;
+}
+
+function toCSV(rows) {
+  if (!rows.length) return '';
+  const keys = Object.keys(rows[0]).filter(k => !k.startsWith('__'));
+  const esc = v => (v.includes(',') || v.includes('"') || v.includes('\n')) ? `"${v.replace(/"/g,'""')}"` : v;
+  return [keys.join(','), ...rows.map(r => keys.map(k => esc(r[k]??'')).join(','))].join('\n');
+}
+
+// ── GitHub API ─────────────────────────────────────
+function ghHeaders() {
+  return { 'Authorization': `Bearer ${cfg.token}`, 'Accept': 'application/vnd.github+json',
+           'X-GitHub-Api-Version': '2022-11-28', 'Content-Type': 'application/json' };
+}
+
+async function ghGet(path) {
+  const r = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`, { headers: ghHeaders() });
+  if (!r.ok) throw new Error(`GitHub API ${r.status}: ${await r.text()}`);
+  return r.json();
+}
+
+async function ghPut(path, content, sha, message) {
+  const encoded = btoa(unescape(encodeURIComponent(content)));
+  const body = { message, content: encoded, ...(sha ? { sha } : {}) };
+  const r = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`,
+    { method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(`GitHub PUT ${r.status}: ${await r.text()}`);
+  return r.json();
+}
+
+async function loadFile(tab) {
+  const path = `data/${tab}_sellers.csv`;
+  const info = await ghGet(path);
+  fileShas[tab] = info.sha;
+  const text = decodeURIComponent(escape(atob(info.content.replace(/\n/g,''))));
+  return parseCSV(text);
+}
+
+// ── 加载所有数据 ─────────────────────────────────
+async function loadAll() {
+  setStatus('\u52a0\u8f7d\u4e2d...', 'yellow');
+  try {
+    const [s1,s2,s3] = await Promise.all(['s1','s2','s3'].map(loadFile));
+    allData = { s1, s2, s3 };
+    changed.clear();
+    setStatus(`S1:${s1.length} S2:${s2.length} S3:${s3.length} \u884c`, 'green');
+    document.getElementById('app').classList.remove('hidden');
+    document.getElementById('empty').classList.add('hidden');
+    document.getElementById('btn-save').disabled = false;
+    renderTable();
+    toast(`\u2705 \u5df2\u52a0\u8f7d ${s1.length+s2.length+s3.length} \u884c\u6570\u636e`);
+  } catch(e) {
+    setStatus('\u8fde\u63a5\u5931\u8d25', 'red');
+    showErr('cfg-err', '\u52a0\u8f7d\u5931\u8d25: ' + e.message);
+  }
+}
+
+// ── 表\u683c\u6e32\u67d3 ─────────────────────────────────
+function renderTable() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const cols = COLS[curTab];
+  const rows = allData[curTab].filter(r =>
+    !q || Object.values(r).some(v => String(v).toLowerCase().includes(q))
+  );
+  const tbl = document.getElementById('tbl');
+  // Header
+  const hRow = `<tr class="bg-gray-100 sticky top-0">${cols.map(([k,l,e],i) =>
+    `<th class="text-left font-semibold text-gray-600 px-2 py-2 whitespace-nowrap ${i===0?'sticky-col':''} ${e?'text-[#0053e2]':''}">${l}</th>`
+  ).join('')}</tr>`;
+  // Body
+  const body = rows.map((r) => {
+    const key = `${curTab}_${r.__row}`;
+    const cls = changed.has(key) ? 'changed-row' : '';
+    const cells = cols.map(([k,l,e,type],i) => {
+      const val = r[k] ?? '';
+      let inp = '';
+      if (!e) {
+        inp = `<span class="text-gray-700">${val}</span>`;
+      } else if (type === 'date') {
+        inp = `<input type="date" value="${val}" onchange="cellChanged('${curTab}',${r.__row},'${k}',this.value)">`;
+      } else if (type && type.startsWith('select:')) {
+        const opts = type.slice(7).split('|').map(o =>
+          `<option ${o===val?'selected':''}>${o}</option>`).join('');
+        inp = `<select onchange="cellChanged('${curTab}',${r.__row},'${k}',this.value)"><option value="">${val||'--'}</option>${opts}</select>`;
+      } else {
+        inp = `<input type="text" value="${val.replace(/"/g,'&quot;')}" onchange="cellChanged('${curTab}',${r.__row},'${k}',this.value)">`;
+      }
+      return `<td class="${i===0?'sticky-col font-medium':''} min-w-[100px] max-w-[200px]">${inp}</td>`;
+    }).join('');
+    return `<tr class="${cls} border-b border-gray-100">${cells}</tr>`;
+  }).join('');
+  tbl.innerHTML = `<thead>${hRow}</thead><tbody>${body || '<tr><td colspan="20" class="text-center py-8 text-gray-400">\u65e0\u6570\u636e</td></tr>'}</tbody>`;
+  updateBadge();
+}
+
+function cellChanged(tab, rowIdx, key, val) {
+  allData[tab][rowIdx][key] = val;
+  changed.add(`${tab}_${rowIdx}`);
+  updateBadge();
+}
+
+function updateBadge() {
+  const b = document.getElementById('change-badge');
+  const n = changed.size;
+  b.textContent = n ? `${n} \u884c\u5f85\u4fdd\u5b58` : '';
+  b.classList.toggle('hidden', !n);
+}
+
+function switchTab(tab, btn) {
+  curTab = tab;
+  document.querySelectorAll('[onclick^="switchTab"]').forEach(b => b.className = 'tab-off px-4 py-3 text-sm');
+  btn.className = 'tab-on px-4 py-3 text-sm';
+  document.getElementById('search').value = '';
+  renderTable();
+}
+
+// ── 保\u5b58\u5230 GitHub ──────────────────────────────
+async function saveAll() {
+  if (!changed.size) { toast('\u2139\ufe0f \u6ca1\u6709\u672a\u4fdd\u5b58\u7684\u6539\u52a8'); return; }
+  const tabs = [...new Set([...changed].map(k => k.split('_')[0]))];
+  const ts   = new Date().toISOString().slice(0,16).replace('T',' ');
+  setStatus('\u4fdd\u5b58\u4e2d...','yellow');
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true; btn.textContent = '\u4fdd\u5b58\u4e2d...';
+  try {
+    for (const tab of tabs) {
+      const csv  = toCSV(allData[tab]);
+      const sha  = fileShas[tab];
+      const path = `data/${tab}_sellers.csv`;
+      const res  = await ghPut(path, csv, sha, `update(${tab}): ${ts} via online editor`);
+      fileShas[tab] = res.content.sha;
+    }
+    changed.clear();
+    updateBadge();
+    renderTable();
+    toast(`\u2705 \u5df2\u4fdd\u5b58\u5230 GitHub \u2014 Actions \u5c06\u5728 1 \u5206\u949f\u5185\u81ea\u52a8\u53d1\u5e03 Dashboard`, 5000);
+    setStatus('\u5df2\u540c\u6b65','green');
+  } catch(e) {
+    toast('\u274c \u4fdd\u5b58\u5931\u8d25: ' + e.message, 6000);
+    setStatus('\u4fdd\u5b58\u5931\u8d25','red');
+  } finally {
+    btn.disabled = false; btn.textContent = '\ud83d\udcbe \u4fdd\u5b58\u5230 GitHub';
+  }
+}
+
+// ── Config ──────────────────────────────────────────
+function showCfg() {
+  cfg = JSON.parse(localStorage.getItem(CFG_KEY) || '{}');
+  document.getElementById('cfg-owner').value = cfg.owner || '';
+  document.getElementById('cfg-repo').value  = cfg.repo  || '';
+  document.getElementById('cfg-token').value = cfg.token || '';
+  showErr('cfg-err','');
+  document.getElementById('cfg-modal').classList.remove('hidden');
+}
+
+async function saveCfg() {
+  cfg = {
+    owner: document.getElementById('cfg-owner').value.trim(),
+    repo:  document.getElementById('cfg-repo').value.trim(),
+    token: document.getElementById('cfg-token').value.trim(),
+  };
+  if (!cfg.owner || !cfg.repo || !cfg.token) { showErr('cfg-err','\u8bf7\u586b\u5168\u6240\u6709\u5b57\u6bb5'); return; }
+  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+  closeCfg();
+  await loadAll();
+}
+
+function closeCfg() { document.getElementById('cfg-modal').classList.add('hidden'); }
+
+// ── Helpers ─────────────────────────────────────────
+function setStatus(msg, color) {
+  const el = document.getElementById('hd-status');
+  el.textContent = msg;
+  el.className = `text-xs px-2 py-1 rounded-full ${{ green:'bg-green-500', red:'bg-red-500', yellow:'bg-yellow-400 text-gray-900' }[color] || 'bg-white/20'}`;
+}
+
+let toastTimer;
+function toast(msg, ms=3000) {
+  const el = document.getElementById('toast');
+  document.getElementById('toast-body').textContent = msg;
+  el.classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.add('hidden'), ms);
+}
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.classList.toggle('hidden', !msg);
+}
+
+// ── 启\u52a8 ────────────────────────────────────────────
+(function init() {
+  cfg = JSON.parse(localStorage.getItem(CFG_KEY) || '{}');
+  if (cfg.token && cfg.owner && cfg.repo) { loadAll(); }
+  else { showCfg(); }
+})();
+</script>
+</body>
+</html>
