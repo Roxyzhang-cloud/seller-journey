@@ -1,0 +1,39 @@
+# GitHub Actions: 每次 push 自动发布 dashboard 到 puppy.walmart.com
+# 触发条件: data/ 或 dashboard/ 目录有任何变更
+
+name: Publish Seller Journey Dashboard
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'dashboard/**'
+      - 'data/**'
+  workflow_dispatch:   # 允许手动点击 "Run workflow"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Publish to puppy.walmart.com
+        env:
+          PUPPY_TOKEN: ${{ secrets.PUPPY_TOKEN }}
+        run: python scripts/github_publish.py
+
+      - name: Post publish summary
+        run: |
+          echo "✅ Dashboard published successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 View: https://puppy.walmart.com/sharing/r0z02di/seller-journey-dashboard" >> $GITHUB_STEP_SUMMARY
+          echo "⏰ Published at: $(date -u +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
