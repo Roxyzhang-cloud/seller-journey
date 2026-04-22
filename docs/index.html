@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Seller Journey - Call Down Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+[x-cloak]{display:none}
+.filter-hidden{display:none!important}
+/* Stage badge colours (shared with backend) */
+.stage-s1{background-color:#dbeafe;color:#1e40af;}
+.stage-s2{background-color:#fef3c7;color:#92400e;}
+.stage-s3{background-color:#d1fae5;color:#065f46;}
+
+.topnav-btn {
+  padding:.3rem .9rem; border-radius:999px;
+  font-size:.75rem; font-weight:600;
+  color:rgba(255,255,255,.75);
+  transition:background .15s,color .15s;
+  border:none; background:transparent; cursor:pointer; white-space:nowrap;
+}
+.topnav-btn:hover { background:rgba(255,255,255,.15); color:#fff; }
+.topnav-btn.active { background:rgba(255,255,255,.22); color:#fff; box-shadow:0 0 0 1px rgba(255,255,255,.3); }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-800 text-sm font-sans">
+
+<!-- TOP NAV -->
+<header class="bg-[#0053e2] text-white px-6 py-2.5 flex items-center gap-3 shadow-md sticky top-0 z-40">
+  <div class="font-bold text-sm whitespace-nowrap">Seller Live Journey</div>
+  <span class="text-blue-200 text-xs hidden sm:inline">Call Down Dashboard</span>
+  <span class="bg-[#ffc220] text-[#0053e2] text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">Walmart</span>
+  <nav class="flex gap-1 ml-4" aria-label="Main navigation">
+    <button id="nav-mechanism" onclick="showPage('mechanism')"
+      class="topnav-btn active" aria-current="page">
+      &#x2699;&#xFE0F; Mechanism
+    </button>
+    <button id="nav-insights" onclick="showPage('insights')"
+      class="topnav-btn">
+      &#x1F4CA; Insights
+    </button>
+    <button id="nav-tracker" onclick="showPage('tracker')"
+      class="topnav-btn">
+      &#x1F4CB; Tracker
+    </button>
+    <button id="nav-sop" onclick="showPage('sop')"
+      class="topnav-btn">
+      &#x1F4D6; SOP &amp; &#x8BDD;&#x672F;
+    </button>
+  </nav>
+  <div class="ml-auto flex gap-3 items-center">
+    <a href="/activity" class="text-xs text-blue-200 hover:text-white font-semibold">&#x1F4DD; Activity</a>
+    <a href="/upload" class="text-xs font-bold bg-[#ffc220] text-[#0053e2] px-3 py-1 rounded-full hover:bg-yellow-300">&#x2B06; Upload</a>
+  </div>
+</header>
+
+<!-- page content -->
+<div class="max-w-screen-2xl mx-auto px-6 py-6">
+<div id="page-mechanism" class="min-h-full">
+<section id="mechanism" style="margin:-24px -24px 0; font-family:'Noto Sans SC',system-ui,sans-serif;">
+
+<!-- ═══ HERO ═══ -->
+<div style="
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 0%, rgba(0,83,226,0.28) 0%, transparent 70%),
+    radial-gradient(ellipse 45% 35% at 85% 25%, rgba(255,194,32,0.10) 0%, transparent 60%),
+    #0a0d14;
+  padding: 48px 40px 40px;
+  position: relative;
+  overflow: hidden;
+">
+  <!-- subtle grid overlay -->
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,83,226,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,83,226,0.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;"></div>
+
+  <!-- Badge row -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;position:relative;">
+    <span style="background:rgba(0,83,226,0.18);color:#6aadff;border:1px solid rgba(0,83,226,0.35);border-radius:999px;padding:3px 14px;font-size:12px;font-weight:600;">&#x1F6CD; Walmart Marketplace</span>
+    <span style="background:rgba(255,194,32,0.14);color:#ffc220;border:1px solid rgba(255,194,32,0.35);border-radius:999px;padding:3px 14px;font-size:12px;font-weight:600;">&#x26A1; CBT Team Internal Tool</span>
+    <span style="background:rgba(42,135,3,0.15);color:#5bcc2f;border:1px solid rgba(42,135,3,0.3);border-radius:999px;padding:3px 14px;font-size:12px;font-weight:600;">&#x1F512; Eagle &amp; VPN Only</span>
+  </div>
+
+  <!-- Title block -->
+  <div style="display:flex;align-items:flex-start;gap:20px;margin-bottom:36px;position:relative;">
+    <div style="font-size:64px;line-height:1;flex-shrink:0;">&#x1F4CA;</div>
+    <div>
+      <h1 style="margin:0 0 10px;font-size:clamp(26px,3.5vw,42px);font-weight:900;letter-spacing:-0.5px;line-height:1.15;color:#f0f4ff;">
+        Seller Journey
+        <span style="color:#0053e2;"> One Stop</span>
+        <br/><span style="color:#ffc220;">Call Down</span> Dashboard
+      </h1>
+      <p style="margin:0;font-size:15px;color:#94a3b8;line-height:1.7;max-width:680px;">
+        一个工具覆盖卖家全生命周期管理 &mdash; 从 <strong style="color:#f0f4ff;">BV 提交上线</strong>（S1），到 <strong style="color:#f0f4ff;">Cold Start 完美启动</strong>（S2），再到 <strong style="color:#f0f4ff;">质量问题处理与恢复</strong>（S3）。<br/>
+        每位 AM 每周通过标准化电话话术完成跟进，有记录 = 有发生。
+      </p>
+    </div>
+  </div>
+
+  <!-- KPI Stats row -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;position:relative;">
+    <div style="background:#111827;border:1px solid #1e293b;border-radius:14px;padding:18px 20px;box-shadow:0 0 20px rgba(0,83,226,0.15);">
+      <div style="font-size:32px;font-weight:900;color:#0053e2;">S1</div>
+      <div style="font-size:13px;color:#6aadff;font-weight:700;margin-top:2px;">Drive to Launch</div>
+      <div style="font-size:12px;color:#64748b;margin-top:6px;">BV &rarr; Risk Ops &rarr; Go-Live</div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+        <span style="background:rgba(0,83,226,0.15);color:#6aadff;border-radius:6px;padding:2px 8px;font-size:11px;">&#x1F4CB; BV Submission</span>
+        <span style="background:rgba(0,83,226,0.15);color:#6aadff;border-radius:6px;padding:2px 8px;font-size:11px;">&#x1F50D; Risk Review</span>
+        <span style="background:rgba(0,83,226,0.15);color:#6aadff;border-radius:6px;padding:2px 8px;font-size:11px;">&#x1F680; Go-Live</span>
+      </div>
+    </div>
+    <div style="background:#111827;border:1px solid #1e293b;border-radius:14px;padding:18px 20px;box-shadow:0 0 20px rgba(255,194,32,0.10);">
+      <div style="font-size:32px;font-weight:900;color:#ffc220;">S2</div>
+      <div style="font-size:13px;color:#ffc220;font-weight:700;margin-top:2px;">Cold Start</div>
+      <div style="font-size:12px;color:#64748b;margin-top:6px;">Day 1&ndash;90 Perfect Launch</div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+        <span style="background:rgba(255,194,32,0.12);color:#ffc220;border-radius:6px;padding:2px 8px;font-size:11px;">&#x1F3F7; Brand Portal</span>
+        <span style="background:rgba(255,194,32,0.12);color:#ffc220;border-radius:6px;padding:2px 8px;font-size:11px;">&#x1F4E2; WMC</span>
+        <span style="background:rgba(255,194,32,0.12);color:#ffc220;border-radius:6px;padding:2px 8px;font-size:11px;">&#x1F4E6; WFS</span>
+        <span style="background:rgba(255,194,32,0.12);color:#ffc220;border-radius:6px;padding:2px 8px;font-size:11px;">&#x2B50; CQ&ge;70</span>
+      </div>
+    </div>
+    <div style="background:#111827;border:1px solid #1e293b;border-radius:14px;padding:18px 20px;box-shadow:0 0 20px rgba(234,17,0,0.10);">
+      <div style="font-size:32px;font-weight:900;color:#ff6b6b;">S3</div>
+      <div style="font-size:13px;color:#ff6b6b;font-weight:700;margin-top:2px;">Seller Quality</div>
+      <div style="font-size:12px;color:#64748b;margin-top:6px;">暂停 / 终止处理与恢复</div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+        <span style="background:rgba(234,17,0,0.12);color:#ff6b6b;border-radius:6px;padding:2px 8px;font-size:11px;">&#x26A0; 识别原因</span>
+        <span style="background:rgba(234,17,0,0.12);color:#ff6b6b;border-radius:6px;padding:2px 8px;font-size:11px;">&#x1F4DE; 当天联系</span>
+        <span style="background:rgba(234,17,0,0.12);color:#ff6b6b;border-radius:6px;padding:2px 8px;font-size:11px;">&#x1F4CA; 跟踪整改</span>
+      </div>
+    </div>
+    <div style="background:#111827;border:1px solid #1e293b;border-radius:14px;padding:18px 20px;">
+      <div style="font-size:32px;font-weight:900;color:#c084fc;">3</div>
+      <div style="font-size:13px;color:#c084fc;font-weight:700;margin-top:2px;">核心准则</div>
+      <div style="font-size:12px;color:#64748b;margin-top:6px;">每位 AM 必须遵守</div>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#94a3b8;"><span style="color:#c084fc;">&#x1F464;</span> 唯一负责人</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#94a3b8;"><span style="color:#c084fc;">&#x1F4DD;</span> 触达必留记录</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#94a3b8;"><span style="color:#c084fc;">&#x1F4AC;</span> 标准化话术</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PIPELINE FLOW ═══ -->
+<div style="background:#0d1117;padding:32px 40px;border-top:1px solid #1e293b;border-bottom:1px solid #1e293b;">
+  <div style="max-width:900px;margin:0 auto;">
+    <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:2px;margin-bottom:20px;">&#x25B6; Seller Journey Pipeline</div>
+    <div style="display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;align-items:center;gap:0;">
+
+      <!-- S1 card -->
+      <div style="background:linear-gradient(135deg,#0d2254,#0053e2 130%);border:1px solid rgba(0,83,226,0.5);border-radius:16px;padding:20px;box-shadow:0 0 28px rgba(0,83,226,0.2);">
+        <div style="font-size:10px;font-weight:800;color:#93c5fd;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Stage 1</div>
+        <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:4px;">&#x1F680; Drive to Launch</div>
+        <div style="font-size:12px;color:#bfdbfe;margin-bottom:14px;">BV提交 &rarr; 风控审核 &rarr; 正式上线</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:6px 10px;font-size:12px;color:#e0eaff;">&#x1F4CB; 1A &middot; BV Submission</div>
+          <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:6px 10px;font-size:12px;color:#e0eaff;">&#x1F50D; 1B &middot; Risk Ops Review</div>
+          <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:6px 10px;font-size:12px;color:#e0eaff;">&#x1F7E2; 1C &middot; Go-Live</div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="text-align:center;">
+        <div style="width:32px;height:32px;background:#ffc220;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#0053e2;font-weight:900;font-size:16px;margin:0 auto;box-shadow:0 0 12px rgba(255,194,32,0.4);">&#x2192;</div>
+      </div>
+
+      <!-- S2 card -->
+      <div style="background:linear-gradient(135deg,#1a1200,#7a5100 130%);border:1px solid rgba(255,194,32,0.4);border-radius:16px;padding:20px;box-shadow:0 0 28px rgba(255,194,32,0.12);">
+        <div style="font-size:10px;font-weight:800;color:#fde68a;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Stage 2</div>
+        <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:4px;">&#x2B50; Cold Start</div>
+        <div style="font-size:12px;color:#fde68a;margin-bottom:14px;">上线后 Day 1&ndash;90 Perfect Launch</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="background:rgba(255,194,32,0.1);border-radius:8px;padding:6px 10px;font-size:12px;color:#fef3c7;">&#x1F3F7; Brand Portal 注册</div>
+          <div style="background:rgba(255,194,32,0.1);border-radius:8px;padding:6px 10px;font-size:12px;color:#fef3c7;">&#x1F4E2; WMC 广告激活</div>
+          <div style="background:rgba(255,194,32,0.1);border-radius:8px;padding:6px 10px;font-size:12px;color:#fef3c7;">&#x1F4E6; WFS 入库</div>
+          <div style="background:rgba(255,194,32,0.1);border-radius:8px;padding:6px 10px;font-size:12px;color:#fef3c7;">&#x2B50; CQ &ge; 70分</div>
+          <div style="background:rgba(255,194,32,0.2);border:1px solid rgba(255,194,32,0.5);border-radius:8px;padding:6px 10px;font-size:12px;color:#ffc220;font-weight:700;">&#x1F3C6; Perfect Launch !</div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="text-align:center;">
+        <div style="width:32px;height:32px;background:#ffc220;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#0053e2;font-weight:900;font-size:16px;margin:0 auto;box-shadow:0 0 12px rgba(255,194,32,0.4);">&#x2192;</div>
+      </div>
+
+      <!-- S3 card -->
+      <div style="background:linear-gradient(135deg,#1a0505,#7f1d1d 130%);border:1px solid rgba(234,17,0,0.4);border-radius:16px;padding:20px;box-shadow:0 0 28px rgba(234,17,0,0.12);">
+        <div style="font-size:10px;font-weight:800;color:#fca5a5;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Stage 3</div>
+        <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:4px;">&#x26D4; Seller Quality</div>
+        <div style="font-size:12px;color:#fca5a5;margin-bottom:14px;">暂停 / 终止 处理与恢复</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="background:rgba(234,17,0,0.12);border-radius:8px;padding:6px 10px;font-size:12px;color:#fecaca;">&#x26A0; 识别暂停原因</div>
+          <div style="background:rgba(234,17,0,0.12);border-radius:8px;padding:6px 10px;font-size:12px;color:#fecaca;">&#x1F4DE; 一周内完成case的处理</div>
+          <div style="background:rgba(234,17,0,0.12);border-radius:8px;padding:6px 10px;font-size:12px;color:#fecaca;">&#x1F4CA; 跟踪整改进度 POA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ WORKFLOW TABLE ═══ -->
+<div style="background:#0d1117;padding:28px 40px;border-bottom:1px solid #1e293b;">
+  <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">&#x1F4CB; 阶段详情 &amp; 负责人</div>
+  <div style="border-radius:12px;overflow:hidden;border:1px solid #1e293b;">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr style="background:rgba(0,83,226,0.25);">
+          <th style="padding:10px 16px;text-align:left;color:#6aadff;font-weight:600;">阶段</th>
+          <th style="padding:10px 16px;text-align:left;color:#6aadff;font-weight:600;">目标</th>
+          <th style="padding:10px 16px;text-align:left;color:#6aadff;font-weight:600;">完成条件</th>
+          <th style="padding:10px 16px;text-align:left;color:#6aadff;font-weight:600;">负责人</th>
+          <th style="padding:10px 16px;text-align:left;color:#6aadff;font-weight:600;">跟进频率</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-top:1px solid #1e293b;transition:background 0.15s;" onmouseover="this.style.background='rgba(0,83,226,0.07)'" onmouseout="this.style.background=''">
+          <td style="padding:12px 16px;"><span style="color:#6aadff;font-weight:700;">S1 &middot; Drive to Launch</span></td>
+          <td style="padding:12px 16px;color:#94a3b8;">BV提交 &rarr; 风控通过 &rarr; 正式上线</td>
+          <td style="padding:12px 16px;color:#94a3b8;">卖家已上线</td>
+          <td style="padding:12px 16px;color:#f0f4ff;font-weight:600;">AM</td>
+          <td style="padding:12px 16px;"><span style="background:rgba(0,83,226,0.15);color:#6aadff;padding:2px 10px;border-radius:6px;font-size:12px;">每周</span></td>
+        </tr>
+        <tr style="border-top:1px solid #1e293b;transition:background 0.15s;" onmouseover="this.style.background='rgba(255,194,32,0.05)'" onmouseout="this.style.background=''">
+          <td style="padding:12px 16px;"><span style="color:#ffc220;font-weight:700;">S2 &middot; Cold Start</span></td>
+          <td style="padding:12px 16px;color:#94a3b8;">Day 1&ndash;90 功能采用 + 首单达成</td>
+          <td style="padding:12px 16px;color:#94a3b8;">Brand Portal + WMC + WFS + CQ&ge;70</td>
+          <td style="padding:12px 16px;color:#f0f4ff;font-weight:600;">AM</td>
+          <td style="padding:12px 16px;"><span style="background:rgba(255,194,32,0.12);color:#ffc220;padding:2px 10px;border-radius:6px;font-size:12px;">每周</span></td>
+        </tr>
+        <tr style="border-top:1px solid #1e293b;transition:background 0.15s;" onmouseover="this.style.background='rgba(234,17,0,0.05)'" onmouseout="this.style.background=''">
+          <td style="padding:12px 16px;"><span style="color:#ff6b6b;font-weight:700;">S3 &middot; Seller Quality</span></td>
+          <td style="padding:12px 16px;color:#94a3b8;">处理暂停/终止，推动恢复</td>
+          <td style="padding:12px 16px;color:#94a3b8;">问题解决或终止</td>
+          <td style="padding:12px 16px;color:#f0f4ff;font-weight:600;">AM</td>
+          <td style="padding:12px 16px;"><span style="background:rgba(234,17,0,0.12);color:#ff6b6b;padding:2px 10px;border-radius:6px;font-size:12px;">As Triggered</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ RULES ═══ -->
+<div style="background:#0a0d14;padding:28px 40px 40px;">
+  <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">&#x1F4CC; 核心准则 — 所有 AM 必须遵守</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+
+    <div style="background:#111827;border:1px solid #1e293b;border-top:3px solid #0053e2;border-radius:14px;padding:20px;box-shadow:0 0 16px rgba(0,83,226,0.1);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div style="width:36px;height:36px;background:rgba(0,83,226,0.18);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">&#x1F464;</div>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:#f0f4ff;">Rule 1 &middot; 唯一负责人</div>
+          <div style="font-size:11px;color:#475569;">Ownership</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:#94a3b8;line-height:1.6;">每个卖家有且只有一个 Owner，不允许无人跟进。<br/>卖家换手必须在 Tracker 中更新。</div>
+    </div>
+
+    <div style="background:#111827;border:1px solid #1e293b;border-top:3px solid #ffc220;border-radius:14px;padding:20px;box-shadow:0 0 16px rgba(255,194,32,0.08);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div style="width:36px;height:36px;background:rgba(255,194,32,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">&#x1F4DD;</div>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:#f0f4ff;">Rule 2 &middot; 触达必留记录</div>
+          <div style="font-size:11px;color:#475569;">Accountability</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:#94a3b8;line-height:1.6;">打了电话、发了邮件，必须在 Tracker 里记录。<br/><span style="color:#ffc220;font-weight:600;">没有记录 = 没有发生。</span></div>
+    </div>
+
+    <div style="background:#111827;border:1px solid #1e293b;border-top:3px solid #2a8703;border-radius:14px;padding:20px;box-shadow:0 0 16px rgba(42,135,3,0.08);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div style="width:36px;height:36px;background:rgba(42,135,3,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">&#x1F4AC;</div>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:#f0f4ff;">Rule 3 &middot; 标准化话术</div>
+          <div style="font-size:11px;color:#475569;">Consistency</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:#94a3b8;line-height:1.6;">所有 AM 使用标准化中文话术，一致的沟通 = 更高转化。<br/>话术见 <span style="color:#5bcc2f;font-weight:600;">SOP &amp; 话术</span> 页面。</div>
+    </div>
+
+  </div>
+</div>
+
+</section>
+</div>
+
+<div id="page-insights" class="min-h-full hidden">
+<section id="insights">
+  <h2 class="text-base font-bold text-[#0053e2] mb-3">&#x1F4CA; Insights Dashboard</h2>
+  <iframe
+    data-src="https://10.14.206.107:8765/insights/embed" src="about:blank"
+    class="w-full border-0 rounded-xl shadow-sm"
+    style="height:1140px;"
+    title="Insights Dashboard - Live from Tracker"
+    loading="lazy"
+  ></iframe>
+</section>
+</div>
+
+<div id="page-tracker" class="min-h-full hidden">
+<section id="tracker">
+  <h2 class="text-base font-bold text-[#0053e2] mb-3">&#x1F4CB; Tracker &mdash; Seller Lists</h2>
+
+  <div class="flex gap-0 mb-0">
+    <button onclick="switchStage('tk','s1')" id="tk-btn-s1"
+      class="tracker-tab px-5 py-2.5 rounded-tl-xl text-sm font-semibold
+             bg-[#0053e2] text-white border border-[#0053e2]">
+      S1 &middot; Drive to Launch
+    </button>
+    <button onclick="switchStage('tk','s2')" id="tk-btn-s2"
+      class="tracker-tab px-5 py-2.5 text-sm font-semibold
+             bg-white text-gray-500 border border-gray-300 border-l-0">
+      S2 &middot; Cold Start
+    </button>
+    <button onclick="switchStage('tk','s3')" id="tk-btn-s3"
+      class="tracker-tab px-5 py-2.5 rounded-tr-xl text-sm font-semibold
+             bg-white text-gray-500 border border-gray-300 border-l-0">
+      S3 &middot; Seller Quality
+    </button>
+  </div>
+  <!-- S1 Tracker -->
+  <div id="tk-tab-s1" class="border border-[#0053e2] rounded-b-xl rounded-tr-xl bg-white overflow-hidden">
+    <div class="px-6 py-4" style="background:linear-gradient(135deg,#0053e2,#0c3f7f);">
+    <div class="text-white font-bold text-base">S1 &middot; Drive to Launch</div>
+    <div class="text-blue-200 text-xs mt-0.5">BV Submission &rarr; Risk Ops Review &rarr; Go-Live</div>
+  </div>
+    <div id="ssub-content-s1-tracker">
+<div class="flex flex-wrap items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-200">
+  <span class="text-xs font-bold text-gray-600 uppercase tracking-wide">S1 &middot; Drive to Launch</span>
+  <span class="bg-[#2a8703] text-white text-xs px-2 py-0.5 rounded-full font-semibold">&#x1F7E2; Live</span>
+  <span class="text-gray-300">|</span>
+  <!-- Team filter -->
+  <label for="s1-team-select" class="text-xs font-semibold text-gray-500">Team</label>
+  <select id="s1-team-select"
+    onchange="s1ApplyFilter()"
+    aria-label="Filter by BD team"
+    class="border border-gray-300 rounded-lg px-2 py-1 text-xs
+           focus:outline-none focus:ring-2 focus:ring-[#0053e2] bg-white">
+    <option value="">ALL</option>
+    <option value="T1">T1</option>
+    <option value="T2">T2</option>
+  </select>
+  <!-- Call Down Team filter -->
+  <label for="s1-cdt-select" class="text-xs font-semibold text-gray-500">Call Down</label>
+  <select id="s1-cdt-select"
+    onchange="s1ApplyFilter()"
+    aria-label="Filter by call down team"
+    class="border border-gray-300 rounded-lg px-2 py-1 text-xs
+           focus:outline-none focus:ring-2 focus:ring-[#0053e2] bg-white">
+    <option value="">ALL</option>
+    <option value="T1">T1</option>
+    <option value="T2">T2</option>
+    <option value="CP">CP</option>
+  </select>
+  <span class="text-gray-300 text-xs">|</span>
+  <a id="s1-open-link"
+     href="https://10.14.206.107:8765/"
+     target="_blank"
+     rel="noopener"
+     class="inline-flex items-center gap-1 text-xs font-semibold text-[#0053e2] hover:underline"
+     aria-label="Open S1 Tracker in full page (edit mode)">
+    &#x1F517; 在新标签页中编辑
+  </a>
+  <span class="text-xs text-gray-400 ml-auto">10.14.206.107:8765</span>
+</div>
+<!-- Shared tracker helper (defined once, used by all iframes) -->
+<script>
+if (!window._trackerHelpersLoaded) {
+  window._trackerHelpersLoaded = true;
+  window.onTrackerError = function(iframe, fallbackId) {
+    iframe.classList.add('hidden');
+    var fb = document.getElementById(fallbackId);
+    if (fb) { fb.classList.remove('hidden'); fb.classList.add('flex'); }
+  };
+  window.retryTracker = function(iframeId, src, fallbackId) {
+    var fb = document.getElementById(fallbackId);
+    if (fb) { fb.classList.add('hidden'); fb.classList.remove('flex'); }
+    var el = document.getElementById(iframeId);
+    if (el) { el.classList.remove('hidden'); el.src = src + (src.includes('?') ? '&' : '?') + '_t=' + Date.now(); }
+  };
+  window.probeTracker = function(iframeId, src, fallbackId) {
+    fetch(src, {method:'HEAD', mode:'no-cors', cache:'no-store'})
+      .then(function() { /* reachable — iframe stays */ })
+      .catch(function() {
+        var el = document.getElementById(iframeId);
+        if (el) el.classList.add('hidden');
+        var fb = document.getElementById(fallbackId);
+        if (fb) { fb.classList.remove('hidden'); fb.classList.add('flex'); }
+      });
+  };
+}
+</script>
+<div id="s1-iframe-container" style="position:relative;">
+  <div id="s1-iframe-fallback"
+       class="hidden flex-col items-center justify-center gap-4
+              bg-gray-50 border border-dashed border-gray-300 rounded-xl"
+       style="height:820px;">
+    <div class="text-5xl">&#x1F50C;</div>
+    <div class="text-sm font-semibold text-gray-600">S1 Tracker 暂时无法连接</div>
+    <div class="text-xs text-gray-400">BD 本地服务器未启动，或网络地址已变更</div>
+    <div class="text-xs font-mono bg-gray-100 px-3 py-1 rounded text-gray-500">10.14.206.107:8765</div>
+    <button onclick="retryTracker('s1-iframe','https://10.14.206.107:8765/?embed=1','s1-iframe-fallback')"
+      class="bg-[#0053e2] hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg">
+      &#x21BA; 重试连接
+    </button>
+  </div>
+  <iframe
+    id="s1-iframe"
+    src="https://10.14.206.107:8765/?embed=1"
+    title="Drive to Launch Live Tracker"
+    class="w-full border-0 block"
+    style="height:820px;"
+    loading="lazy"
+    onerror="onTrackerError(this,'s1-iframe-fallback')"
+  ></iframe>
+</div>
+<script>probeTracker('s1-iframe','https://10.14.206.107:8765/?embed=1','s1-iframe-fallback');</script>
+<script>
+function s1ApplyFilter() {
+  var BASE = 'https://10.14.206.107:8765/';
+  var team = document.getElementById('s1-team-select').value;
+  var cdt  = document.getElementById('s1-cdt-select').value;
+  var params = new URLSearchParams();
+  params.set('embed', '1');
+  if (team) params.set('team', team);
+  if (cdt)  params.set('call_down_team', cdt);
+  var iframeSrc = BASE + '?' + params.toString();
+  var el = document.getElementById('s1-iframe');
+  if (el) {
+    el.classList.remove('hidden');
+    var fb = document.getElementById('s1-iframe-fallback');
+    if (fb) { fb.classList.add('hidden'); fb.classList.remove('flex'); }
+    el.src = iframeSrc;
+  }
+  // Keep "open in new tab" link in sync (without embed)
+  var openParams = new URLSearchParams();
+  if (team) openParams.set('team', team);
+  if (cdt)  openParams.set('call_down_team', cdt);
+  var link = document.getElementById('s1-open-link');
+  if (link) link.href = BASE + (openParams.toString() ? '?' + openParams.toString() : '');
+}
+</script>
+</div>
+  </div>
+  <!-- S2 Tracker -->
+  <div id="tk-tab-s2" class="hidden border border-[#0c3f7f] rounded-b-xl rounded-tr-xl bg-white overflow-hidden">
+    <div class="px-6 py-4" style="background:linear-gradient(135deg,#0c3f7f,#1a2e4a);">
+    <div class="text-white font-bold text-base">S2 &middot; Cold Start</div>
+    <div class="text-blue-200 text-xs mt-0.5">Day 1&ndash;90 Perfect Launch Adoption</div>
+  </div>
+    <div id="ssub-content-s2-tracker">
+<!-- S2 Filter Bar -->
+<div class="flex flex-wrap items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-200">
+  <span class="text-xs font-bold text-[#0c3f7f] uppercase tracking-wide">S2 &middot; Cold Start</span>
+  <span class="bg-[#2a8703] text-white text-xs px-2 py-0.5 rounded-full font-semibold">&#x1F7E2; Live</span>
+  <span class="text-gray-300">|</span>
+  <!-- Priority filter -->
+  <label for="s2-priority-select" class="text-xs font-semibold text-gray-500">Priority</label>
+  <select id="s2-priority-select"
+    onchange="s2ApplyFilter()"
+    aria-label="Filter by call priority"
+    class="border border-gray-300 rounded-lg px-2 py-1 text-xs
+           focus:outline-none focus:ring-2 focus:ring-[#0c3f7f] bg-white">
+    <option value="">ALL</option>
+    <option value="Tier1">Tier 1 &#x1F534;</option>
+    <option value="Tier2">Tier 2 &#x1F7E1;</option>
+    <option value="Tier3">Tier 3 &#x1F535;</option>
+  </select>
+  <!-- Team filter -->
+  <label for="s2-team-select" class="text-xs font-semibold text-gray-500">Team</label>
+  <select id="s2-team-select"
+    onchange="s2ApplyFilter()"
+    aria-label="Filter by team"
+    class="border border-gray-300 rounded-lg px-2 py-1 text-xs
+           focus:outline-none focus:ring-2 focus:ring-[#0c3f7f] bg-white">
+    <option value="">ALL</option>
+    <option value="T1">T1</option>
+    <option value="T2">T2</option>
+    <option value="Inbound">Inbound</option>
+  </select>
+  <!-- Search -->
+  <label for="s2-search-input" class="text-xs font-semibold text-gray-500">Search</label>
+  <input id="s2-search-input" type="search" placeholder="PID / company / AM…"
+    onkeydown="if(event.key==='Enter') s2ApplyFilter()"
+    aria-label="Search S2 sellers"
+    class="border border-gray-300 rounded-lg px-2 py-1 text-xs w-40
+           focus:outline-none focus:ring-2 focus:ring-[#0c3f7f]">
+  <button onclick="s2ApplyFilter()"
+    class="bg-[#0c3f7f] hover:bg-blue-900 text-white text-xs font-semibold px-3 py-1 rounded-lg">
+    &#x1F50D;
+  </button>
+  <button onclick="s2ClearFilter()"
+    class="text-gray-400 hover:text-gray-600 text-xs px-2 py-1 rounded-lg">
+    Clear
+  </button>
+  <span class="text-gray-300 text-xs">|</span>
+  <a id="s2-open-link"
+     href="https://10.14.206.107:8765/s2/"
+     target="_blank"
+     rel="noopener"
+     class="inline-flex items-center gap-1 text-xs font-semibold text-[#0c3f7f] hover:underline"
+     aria-label="Open S2 Tracker in full page for editing">
+    &#x1F517; 在新标签页中编辑
+  </a>
+  <span class="text-xs text-gray-400 ml-auto">10.14.206.107:8765/s2</span>
+</div>
+<div id="s2-iframe-container" style="position:relative;">
+  <div id="s2-iframe-fallback"
+       class="hidden flex-col items-center justify-center gap-4
+              bg-gray-50 border border-dashed border-gray-300 rounded-xl"
+       style="height:860px;">
+    <div class="text-5xl">&#x1F50C;</div>
+    <div class="text-sm font-semibold text-gray-600">S2 Tracker 暂时无法连接</div>
+    <div class="text-xs text-gray-400">BD 本地服务器未启动，或网络地址已变更</div>
+    <div class="text-xs font-mono bg-gray-100 px-3 py-1 rounded text-gray-500">10.14.206.107:8765</div>
+    <div class="flex gap-2">
+      <button onclick="s2RetryIframe()"
+        class="bg-[#0c3f7f] hover:bg-blue-900 text-white text-xs font-semibold px-4 py-2 rounded-lg">
+        &#x21BA; 重试连接
+      </button>
+      <a href="https://10.14.206.107:8765/s2/" target="_blank" rel="noopener"
+        class="bg-[#ffc220] hover:bg-yellow-400 text-[#0053e2] text-xs font-semibold px-4 py-2 rounded-lg inline-flex items-center gap-1">
+        &#x1F517; 直接打开编辑
+      </a>
+    </div>
+  </div>
+  <iframe
+    id="s2-iframe"
+    src="https://10.14.206.107:8765/s2/?embed=1"
+    title="Cold Start Live Tracker"
+    class="w-full border-0 block"
+    style="height:860px;"
+    loading="lazy"
+    onerror="onTrackerError(this,'s2-iframe-fallback')"
+  ></iframe>
+</div>
+<script>probeTracker('s2-iframe','https://10.14.206.107:8765/s2/?embed=1','s2-iframe-fallback');</script>
+<script>
+function s2ApplyFilter() {
+  var BASE     = 'https://10.14.206.107:8765/s2/';
+  var priority = document.getElementById('s2-priority-select').value;
+  var team     = document.getElementById('s2-team-select').value;
+  var search   = (document.getElementById('s2-search-input').value || '').trim();
+  var params   = new URLSearchParams();
+  params.set('embed', '1');
+  if (priority) params.set('priority', priority);
+  if (team)     params.set('team', team);
+  if (search)   params.set('search', search);
+  var iframeSrc = BASE + '?' + params.toString();
+  var el = document.getElementById('s2-iframe');
+  if (el) {
+    el.classList.remove('hidden');
+    var fb = document.getElementById('s2-iframe-fallback');
+    if (fb) { fb.classList.add('hidden'); fb.classList.remove('flex'); }
+    el.src = iframeSrc;
+  }
+  // Sync open-in-new-tab link (without embed)
+  var openParams = new URLSearchParams();
+  if (priority) openParams.set('priority', priority);
+  if (team)     openParams.set('team', team);
+  if (search)   openParams.set('search', search);
+  var link = document.getElementById('s2-open-link');
+  if (link) link.href = BASE + (openParams.toString() ? '?' + openParams.toString() : '');
+}
+function s2ClearFilter() {
+  document.getElementById('s2-priority-select').value = '';
+  document.getElementById('s2-team-select').value     = '';
+  document.getElementById('s2-search-input').value    = '';
+  s2ApplyFilter();
+}
+function s2RetryIframe() {
+  var priority = document.getElementById('s2-priority-select').value;
+  var team     = document.getElementById('s2-team-select').value;
+  var search   = (document.getElementById('s2-search-input').value || '').trim();
+  var params   = new URLSearchParams();
+  params.set('embed', '1');
+  params.set('_t', Date.now());
+  if (priority) params.set('priority', priority);
+  if (team)     params.set('team', team);
+  if (search)   params.set('search', search);
+  var fb = document.getElementById('s2-iframe-fallback');
+  if (fb) { fb.classList.add('hidden'); fb.classList.remove('flex'); }
+  var el = document.getElementById('s2-iframe');
+  if (el) { el.classList.remove('hidden'); el.src = 'https://10.14.206.107:8765/s2/?' + params.toString(); }
+}
+</script>
+</div>
+  </div>
+  <!-- S3 Tracker -->
+  <div id="tk-tab-s3" class="hidden border border-[#1a2e4a] rounded-b-xl rounded-tr-xl bg-white overflow-hidden">
+    <div class="px-6 py-4" style="background:linear-gradient(135deg,#1a2e4a,#2d3748);">
+    <div class="text-white font-bold text-base">S3 &middot; Seller Quality</div>
+    <div class="text-blue-200 text-xs mt-0.5">Suspension &amp; Termination Management</div>
+  </div>
+    <div id="ssub-content-s3-tracker">
+<!-- S3 Filter Bar -->
+<div class="flex flex-wrap items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-200">
+  <span class="text-xs font-bold text-red-800 uppercase tracking-wide">S3 &middot; Seller Quality</span>
+  <span class="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-semibold">&#x26A0; Active</span>
+  <span class="text-gray-300">|</span>
+  <!-- Quality Type filter -->
+  <label for="s3-qtype-select" class="text-xs font-semibold text-gray-500">Type</label>
+  <select id="s3-qtype-select"
+    onchange="s3ApplyFilter()"
+    aria-label="Filter by quality type"
+    class="border border-gray-300 rounded-lg px-2 py-1 text-xs
+           focus:outline-none focus:ring-2 focus:ring-red-500 bg-white">
+    <option value="">ALL</option>
+    <option value="Suspended">⬇ Suspended</option>
+    <option value="Terminated">⛔ Terminated</option>
+    <option value="Pre-suspend Alert">⚠ Pre-suspend Alert</option>
+  </select>
+  <!-- Owner / BD filter -->
+  <label for="s3-owner-input" class="text-xs font-semibold text-gray-500">BD Owner</label>
+  <input id="s3-owner-input" type="search" placeholder="Search owner…"
+    onkeydown="if(event.key==='Enter') s3ApplyFilter()"
+    aria-label="Filter by BD owner name"
+    class="border border-gray-300 rounded-lg px-2 py-1 text-xs w-36
+           focus:outline-none focus:ring-2 focus:ring-red-500">
+  <!-- General search -->
+  <label for="s3-search-input" class="text-xs font-semibold text-gray-500">Search</label>
+  <input id="s3-search-input" type="search" placeholder="PID / company…"
+    onkeydown="if(event.key==='Enter') s3ApplyFilter()"
+    aria-label="Search S3 sellers by PID or company"
+    class="border border-gray-300 rounded-lg px-2 py-1 text-xs w-36
+           focus:outline-none focus:ring-2 focus:ring-red-500">
+  <button onclick="s3ApplyFilter()"
+    class="bg-red-700 hover:bg-red-800 text-white text-xs font-semibold px-3 py-1 rounded-lg">
+    &#x1F50D;
+  </button>
+  <button onclick="s3ClearFilter()"
+    class="text-gray-400 hover:text-gray-600 text-xs px-2 py-1 rounded-lg">
+    Clear
+  </button>
+  <span class="text-gray-300 text-xs">|</span>
+  <a id="s3-open-link"
+     href="https://10.14.206.107:8765/s3/"
+     target="_blank"
+     rel="noopener"
+     class="inline-flex items-center gap-1 text-xs font-semibold text-red-700 hover:underline"
+     aria-label="Open S3 Tracker in full page for editing">
+    &#x1F517; 在新标签页中编辑
+  </a>
+  <span class="text-xs text-gray-400 ml-auto">10.14.206.107:8765/s3</span>
+</div>
+<div id="s3-iframe-container" style="position:relative;">
+  <div id="s3-iframe-fallback"
+       class="hidden flex-col items-center justify-center gap-4
+              bg-gray-50 border border-dashed border-gray-300 rounded-xl"
+       style="height:880px;">
+    <div class="text-5xl">&#x1F50C;</div>
+    <div class="text-sm font-semibold text-gray-600">S3 Tracker 暂时无法连接</div>
+    <div class="text-xs text-gray-400">BD 本地服务器未启动，或网络地址已变更</div>
+    <div class="text-xs font-mono bg-gray-100 px-3 py-1 rounded text-gray-500">10.14.206.107:8765</div>
+    <div class="flex gap-2">
+      <button onclick="s3RetryIframe()"
+        class="bg-[#1a2e4a] hover:bg-gray-900 text-white text-xs font-semibold px-4 py-2 rounded-lg">
+        &#x21BA; 重试连接
+      </button>
+      <a href="https://10.14.206.107:8765/s3/" target="_blank" rel="noopener"
+        class="bg-[#ffc220] hover:bg-yellow-400 text-[#0053e2] text-xs font-semibold px-4 py-2 rounded-lg inline-flex items-center gap-1">
+        &#x1F517; 直接打开编辑
+      </a>
+    </div>
+  </div>
+  <iframe
+    id="s3-iframe"
+    src="https://10.14.206.107:8765/s3/?embed=1"
+    title="Seller Quality Live Tracker"
+    class="w-full border-0 block"
+    style="height:880px;"
+    loading="lazy"
+    onerror="onTrackerError(this,'s3-iframe-fallback')"
+  ></iframe>
+</div>
+<script>probeTracker('s3-iframe','https://10.14.206.107:8765/s3/?embed=1','s3-iframe-fallback');</script>
+<script>
+function s3ApplyFilter() {
+  var BASE   = 'https://10.14.206.107:8765/s3/';
+  var qtype  = document.getElementById('s3-qtype-select').value;
+  var owner  = (document.getElementById('s3-owner-input').value || '').trim();
+  var search = (document.getElementById('s3-search-input').value || '').trim();
+  var params = new URLSearchParams();
+  params.set('embed', '1');
+  if (qtype)  params.set('quality_type', qtype);
+  if (owner)  params.set('owner', owner);
+  if (search) params.set('search', search);
+  var iframeSrc = BASE + '?' + params.toString();
+  var el = document.getElementById('s3-iframe');
+  if (el) {
+    el.classList.remove('hidden');
+    var fb = document.getElementById('s3-iframe-fallback');
+    if (fb) { fb.classList.add('hidden'); fb.classList.remove('flex'); }
+    el.src = iframeSrc;
+  }
+  // Sync open-in-new-tab link (without embed)
+  var openParams = new URLSearchParams();
+  if (qtype)  openParams.set('quality_type', qtype);
+  if (owner)  openParams.set('owner', owner);
+  if (search) openParams.set('search', search);
+  var link = document.getElementById('s3-open-link');
+  if (link) link.href = BASE + (openParams.toString() ? '?' + openParams.toString() : '');
+}
+function s3ClearFilter() {
+  document.getElementById('s3-qtype-select').value = '';
+  document.getElementById('s3-owner-input').value  = '';
+  document.getElementById('s3-search-input').value = '';
+  s3ApplyFilter();
+}
+function s3RetryIframe() {
+  var qtype  = document.getElementById('s3-qtype-select').value;
+  var owner  = (document.getElementById('s3-owner-input').value || '').trim();
+  var search = (document.getElementById('s3-search-input').value || '').trim();
+  var params = new URLSearchParams();
+  params.set('embed', '1');
+  params.set('_t', Date.now());
+  if (qtype)  params.set('quality_type', qtype);
+  if (owner)  params.set('owner', owner);
+  if (search) params.set('search', search);
+  var fb = document.getElementById('s3-iframe-fallback');
+  if (fb) { fb.classList.add('hidden'); fb.classList.remove('flex'); }
+  var el = document.getElementById('s3-iframe');
+  if (el) { el.classList.remove('hidden'); el.src = 'https://10.14.206.107:8765/s3/?' + params.toString(); }
+}
+</script>
+</div>
+  </div>
+</section>
+</div>
+
+<div id="page-sop" class="min-h-full hidden">
+<section id="sop">
+  <h2 class="text-base font-bold text-purple-700 mb-3">&#x1F4D6; SOP &amp; &#x8BDD;&#x672F;</h2>
+  <div class="flex gap-0 mb-0">
+    <button onclick="switchStage('sp','s1')" id="sp-btn-s1"
+      class="tracker-tab px-5 py-2.5 rounded-tl-xl text-sm font-semibold
+             bg-[#0053e2] text-white border border-[#0053e2]">
+      S1 &middot; Drive to Launch
+    </button>
+    <button onclick="switchStage('sp','s2')" id="sp-btn-s2"
+      class="tracker-tab px-5 py-2.5 text-sm font-semibold
+             bg-white text-gray-500 border border-gray-300 border-l-0">
+      S2 &middot; Cold Start
+    </button>
+    <button onclick="switchStage('sp','s3')" id="sp-btn-s3"
+      class="tracker-tab px-5 py-2.5 rounded-tr-xl text-sm font-semibold
+             bg-white text-gray-500 border border-gray-300 border-l-0">
+      S3 &middot; Seller Quality
+    </button>
+  </div>
+  <!-- S1 SOP -->
+  <div id="sp-tab-s1" class="border border-[#0053e2] rounded-b-xl rounded-tr-xl bg-white overflow-hidden">
+    <div class="px-6 py-4" style="background:linear-gradient(135deg,#0053e2,#0c3f7f);">
+    <div class="text-white font-bold text-base">S1 &middot; Drive to Launch</div>
+    <div class="text-blue-200 text-xs mt-0.5">BV Submission &rarr; Risk Ops Review &rarr; Go-Live</div>
+  </div>
+    <div class="p-4 space-y-3"><div id="ssub-content-s1-sop" class="p-4 space-y-3">
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+  <button onclick="toggleSOP('s1a')" class="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition text-left">
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="text-xs font-bold bg-[#0053e2] text-white px-2 py-0.5 rounded">S1 · Phase 1</span>
+      <span class="font-semibold text-gray-800">📄 BV Submission 资质提交</span>
+      <span class="text-xs text-gray-400">· 每周跟进 · 5 次不回应 → 升级</span>
+    </div>
+    <svg id="sop-arrow-s1a" class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+  </button>
+  <div id="sop-body-s1a" class="border-t border-gray-100">
+    <div class="flex gap-1 px-5 pt-4 pb-0">
+      <button onclick="sopTab('s1a','steps')" id="stab-s1a-steps" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-[#0053e2] text-[#0053e2] bg-white">📍 Steps</button>
+          <button onclick="sopTab('s1a','am')" id="stab-s1a-am" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">📞 AM 话术</button>
+          <button onclick="sopTab('s1a','wecom')" id="stab-s1a-wecom" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">💬 WeCom</button>
+          </div>
+    <div id="sop-tab-s1a-steps" class="sop-tab-content-s1a p-5"><ol class="space-y-2 mb-4"><li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span><span class="text-sm text-gray-700">联系卖家，确认已收到 BV 材料要求邮件</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span><span class="text-sm text-gray-700">带卖家过一遍所需文件（身份证、营业执照等）</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span><span class="text-sm text-gray-700">确认阻碞点：什么在阻止提交？</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">4</span><span class="text-sm text-gray-700">约定提交截止日 → 双方确认时间节点</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">5</span><span class="text-sm text-gray-700">在 Tracker 记录进展 → 设置下次跨起</span></li>
+</ol><div class="bg-blue-50 border-blue-100 text-blue-600 border rounded-lg px-3 py-2 text-xs mt-2">↑ 升级条件：5 次触达无回应 → 升级处理</div></div>
+    <div id="sop-tab-s1a-am" class="sop-tab-content-s1a hidden p-5"><div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">📞 电话 AM 标准话术</div><div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">"喂，您好，是 [卖家姓名/公司名] 吗？我是咋们这边的客户经理（AM）[您的名字]。今天打给您主要是想跟您对一下咋们店铺注册的进度。
+
+我看系统里咋们到了资质审核（BV）这一步了。您最近有收到提示提交材料的邮件通知吗？
+
+对，主要就是法人身份证、营业执照这些基础文件。您这边准备这些材料还顺利吗？有没有卡在哪个环节，或者不太清楚怎么弄的地方？
+
+明白。那为了咋们店铺能尽早批下来，您看 [本周五 / 具体日期] 之前，能不能抽空把这些材料在后台提交一下？
+
+那我就先在系统里给您备注上 [日期] 提交了。这几天我会帮您盯着点进度，有啊问题您随时邮件/消息找我哈。咋们抓紧推进！"</div><div class="mt-2 text-xs text-gray-400">[ ] 内容替换为实际信息</div></div>
+    <div id="sop-tab-s1a-wecom" class="sop-tab-content-s1a hidden p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-xs font-bold text-gray-500 uppercase tracking-wide">💬 WeCom 脚本</div>
+            <button class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-lg font-semibold hover:bg-green-200" onclick="copyWecom('wecom-text-s1a')">📋 Copy</button>
+          </div>
+          <div class="bg-[#f0f9eb] border border-green-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed font-mono" id="wecom-text-s1a">[卖家姓名/公司名]
+您好，沃尔玛店铺的注册接下来需要进行业务验证，包括资质验证/收款验证两部分。
+
+资质验证需要提供公司中英文信息，法人及首要联系人信息。
+大陆公司:营业执照/授权书/身份证
+香港公司:公司注册证书/商业登记证书/企业年度申报表/授权书/身份证或护照。
+
+收款验证需要验证公司名下的收款服务商账号。
+
+这些材料的准备是否顺利？预计在哪一天会完成提交？
+（听取卖家回复）（如果有卡点，直接解答或记录阻砖因素）（记录卖家确认时间）</div>
+          <div class="mt-2 text-xs text-gray-400">绿色背景 = 可直接粘贴至 WeCom 发送</div>
+        </div>
+  </div>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+  <button onclick="toggleSOP('s1b')" class="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition text-left">
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="text-xs font-bold bg-purple-700 text-white px-2 py-0.5 rounded">S1 · Phase 2</span>
+      <span class="font-semibold text-gray-800">🔍 Risk Ops Review 风控审核</span>
+      <span class="text-xs text-gray-400">· 无需电话 · BD 每周检查状态</span>
+    </div>
+    <svg id="sop-arrow-s1b" class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+  </button>
+  <div id="sop-body-s1b" class="border-t border-gray-100">
+    <div class="flex gap-1 px-5 pt-4 pb-0">
+      <button onclick="sopTab('s1b','steps')" id="stab-s1b-steps" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-[#0053e2] text-[#0053e2] bg-white">📍 Steps</button>
+          <button onclick="sopTab('s1b','am')" id="stab-s1b-am" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">📞 AM 话术</button>
+          </div>
+    <div id="sop-tab-s1b-steps" class="sop-tab-content-s1b p-5"><ol class="space-y-2 mb-4"><li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-purple-700 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span><span class="text-sm text-gray-700">Risk Ops 审核卖家文件，结果: Approved / Rejected / Info Needed</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-purple-700 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span><span class="text-sm text-gray-700">BD 每周检查一次 — 如 Pending &gt;10 个工作日 → 通过 L2L Funnel 升级</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-purple-700 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span><span class="text-sm text-gray-700">如果状态为 'Info Needed' → 联系卖家收集缺少文件 → 重新提交</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-purple-700 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">4</span><span class="text-sm text-gray-700">在 Tracker 记录每次检查结果 + 升级时间</span></li>
+</ol><div class="bg-blue-50 border-blue-100 text-blue-600 border rounded-lg px-3 py-2 text-xs mt-2"> 如果状态为 "Info Needed" → 马上联系卖家虚收缺少文件，重新提交</div></div>
+    <div id="sop-tab-s1b-am" class="sop-tab-content-s1b hidden p-5"><div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">📞 电话 AM 标准话术</div><div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">此阶段由 Risk Ops 内部处理，通常无需电话卖家。
+BD 需每周检查状态，超过 10 个工作日未有进展则通过 L2L Funnel 升级。</div><div class="mt-2 text-xs text-gray-400">[ ] 内容替换为实际信息</div></div>
+    
+  </div>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+  <button onclick="toggleSOP('s1c')" class="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition text-left">
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="text-xs font-bold bg-green-700 text-white px-2 py-0.5 rounded">S1 · Phase 3</span>
+      <span class="font-semibold text-gray-800">🚀 Drive Go-Live 推动上线</span>
+      <span class="text-xs text-gray-400">· 审核通过后 · 7 天无进展 → 升级</span>
+    </div>
+    <svg id="sop-arrow-s1c" class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+  </button>
+  <div id="sop-body-s1c" class="border-t border-gray-100">
+    <div class="flex gap-1 px-5 pt-4 pb-0">
+      <button onclick="sopTab('s1c','steps')" id="stab-s1c-steps" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-[#0053e2] text-[#0053e2] bg-white">📍 Steps</button>
+          <button onclick="sopTab('s1c','am')" id="stab-s1c-am" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">📞 AM 话术</button>
+          <button onclick="sopTab('s1c','wecom')" id="stab-s1c-wecom" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">💬 WeCom</button>
+          </div>
+    <div id="sop-tab-s1c-steps" class="sop-tab-content-s1c p-5"><ol class="space-y-2 mb-4"><li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span><span class="text-sm text-gray-700">通知卖家风控审核已通过，表示祝贺！</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span><span class="text-sm text-gray-700">确认配送方式：WFS（沃尔玛配送）还是 SFF（卖家自发货）</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span><span class="text-sm text-gray-700">WFS 流程：库存准备 → 创建入库单（Shipment）→ 货物在途 → 仓库收货</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">4</span><span class="text-sm text-gray-700">SFF 流程：确认 Listing 准备就绪 + 物流帐户设置完成</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">5</span><span class="text-sm text-gray-700">约定预期上线日期 → 记录在 Tracker</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">6</span><span class="text-sm text-gray-700">如暫不上线 → 询问原因 → 记录不上线原因代码</span></li>
+</ol><div class="bg-blue-50 border-blue-100 text-blue-600 border rounded-lg px-3 py-2 text-xs mt-2">↑ 升级条件：5 次触达无回应 → 升级处理</div></div>
+    <div id="sop-tab-s1c-am" class="sop-tab-content-s1c hidden p-5">
+<div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">📞 电话 AM 标准话术</div>
+
+<!-- Opening -->
+<div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-700 leading-relaxed mb-3">
+  <span class="text-gray-400 text-xs font-semibold">☎️ 开场白</span><br/><br/>
+  喂，您好 <span class="bg-yellow-100 text-yellow-800 font-semibold px-1 rounded">[卖家称呼]</span>！我是您的AM <span class="bg-yellow-100 text-yellow-800 font-semibold px-1 rounded">[您的名字]</span>。跟您同步个好消息，咱们店铺的审核已经过了，现在随时可以准备上线啦！<br/><br/>
+  接下来咱们得把物流这块敲定。您这边前期是打算走咱们官方仓（WFS）呢，还是先自己发货（SFF）跑跑看？
+</div>
+
+<!-- Branch A: WFS -->
+<div class="border border-blue-200 bg-blue-50 rounded-xl p-4 text-sm text-gray-700 leading-relaxed mb-3">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="text-base">🔵</span>
+    <span class="font-bold text-[#0053e2] text-xs uppercase tracking-wide">分支 A — 卖家选择 WFS</span>
+  </div>
+  <p class="mb-2">"走WFS挺好的，流量也有扶持。那您现在的备货进度咋样了？后台有没有开始建发货计划（Shipment）？大概准备什么时候把货发往仓库呀？"</p>
+  <div class="bg-blue-100 border border-blue-200 rounded-lg px-3 py-2 text-xs text-blue-700 mb-2">📌 确认PO进度（库存准备 → 创建货件 → 入库）</div>
+  <p>"Walmart 头程服务有了解过吗？成本平均可节省 <span class="font-bold text-[#0053e2]">15%</span>，我把具体介绍发您邮箱，您可以了解下。"</p>
+</div>
+
+<!-- Branch B: SFF -->
+<div class="border border-orange-200 bg-orange-50 rounded-xl p-4 text-sm text-gray-700 leading-relaxed mb-3">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="text-base">🟠</span>
+    <span class="font-bold text-orange-700 text-xs uppercase tracking-wide">分支 B — 卖家选择 SFF</span>
+  </div>
+  <p class="mb-2">"明白，前期自己发货也比较灵活。那咱们现在产品的Listing（链接）都传好了吗？后台的物流和运费模板（Shipping setup）设置得没问题吧？"</p>
+  <div class="bg-orange-100 border border-orange-200 rounded-lg px-3 py-2 text-orange-700">📌 确认Listing就绪且物流设置完成</div>
+</div>
+
+<!-- Closing -->
+<div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-700 leading-relaxed">
+  <span class="text-gray-400 text-xs font-semibold">🎯 确认上线时间 &amp; 收尾</span><br/><br/>
+  <p class="mb-2">那结合目前的进度，您大概计划几号能把店铺正式激活上线呢？</p>
+  <div class="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-700 mb-3">📌 卖家确认预期上线时间。如果卖家表示近期不打算上线，则顺势询问：</div>
+  <p class="mb-2">"哎？近期还不打算上吗？是遇到什么难处了吗，比如选品还没定，还是供应链没跟上？看怎么能帮到您。"</p>
+  <div class="bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-500 mb-3">👂 （听取卖家回复）</div>
+  <p>"情况我都记下来了。咱们这几天保持沟通，争取让店铺早点上线出单！有事随时找我。"</p>
+</div>
+
+<div class="mt-2 text-xs text-gray-400"><span class="bg-yellow-100 text-yellow-800 px-1 rounded">[ ]</span> 内容替换为实际信息</div></div>
+    <div id="sop-tab-s1c-wecom" class="sop-tab-content-s1c hidden p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-xs font-bold text-gray-500 uppercase tracking-wide">💬 WeCom 脚本</div>
+            <button class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-lg font-semibold hover:bg-green-200" onclick="copyWecom('wecom-text-s1c')">📋 Copy</button>
+          </div>
+          <div class="bg-[#f0f9eb] border border-green-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed font-mono" id="wecom-text-s1c">【[卖家名称/公司名称]】您好！
+同步一个好消息 😊 咋们店铺业务验证已通过，现在只需要完成以下步骤即可上线！
+
+第一步 🏠 店铺信息设置
+需要设置店铺名 & 顾客服务信息 & 公司基本信息
+
+第二步 🚚 物流方式设置
+需要填写退货地址，同时需确定物流选择 WFS 或自发货
+
+第三步 📦 商品上传和库存设置
+需要完成 Listing 创建并设置自发货库存，或等待 WFS 库存入仓
+
+以上三项设置是否顺利？预计在哪一天完成库存设置正式开售？
+（听取卖家回复）（如果有卡点直接解答，记录卖家确认时间）</div>
+          <div class="mt-2 text-xs text-gray-400">绿色背景 = 可直接粘贴至 WeCom 发送</div>
+        </div>
+  </div>
+</div>
+</div></div>
+  </div>
+  <!-- S2 SOP -->
+  <div id="sp-tab-s2" class="hidden border border-[#0c3f7f] rounded-b-xl rounded-tr-xl bg-white overflow-hidden">
+    <div class="px-6 py-4" style="background:linear-gradient(135deg,#0c3f7f,#1a2e4a);">
+    <div class="text-white font-bold text-base">S2 &middot; Cold Start</div>
+    <div class="text-blue-200 text-xs mt-0.5">Day 1&ndash;90 Perfect Launch Adoption</div>
+  </div>
+    <div class="p-4 space-y-3"><div id="ssub-content-s2-sop" class="p-4 space-y-3">
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+  <button onclick="toggleSOP('s2-bp')" class="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition text-left">
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="text-xs font-bold bg-[#0053e2] text-white px-2 py-0.5 rounded">S2 · Brand Portal</span>
+      <span class="font-semibold text-gray-800">🏠 Brand Portal 注册</span>
+      <span class="text-xs text-gray-400">· 上线后 14 天内完成</span>
+    </div>
+    <svg id="sop-arrow-s2-bp" class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+  </button>
+  <div id="sop-body-s2-bp" class="border-t border-gray-100">
+    <div class="flex gap-1 px-5 pt-4 pb-0">
+      <button onclick="sopTab('s2-bp','steps')" id="stab-s2-bp-steps" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-[#0053e2] text-[#0053e2] bg-white">📍 Steps</button>
+          <button onclick="sopTab('s2-bp','am')" id="stab-s2-bp-am" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">📞 AM 话术</button>
+          <button onclick="sopTab('s2-bp','wecom')" id="stab-s2-bp-wecom" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">💬 WeCom</button>
+          </div>
+    <div id="sop-tab-s2-bp-steps" class="sop-tab-content-s2-bp p-5"><ol class="space-y-2 mb-4"><li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span><span class="text-sm text-gray-700">确认卖家是否拥有自有品牌（独占品牌或共同品牌）</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span><span class="text-sm text-gray-700">确认是否注册咋尔玛 Brand Portal（可查看卖家后台）</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span><span class="text-sm text-gray-700">如未注册 → 发送注册指引 + 知义消息追踪</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">4</span><span class="text-sm text-gray-700">确认圈子申请进度：已提交 / 审核中 / 已通过 / 驳回</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0053e2] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">5</span><span class="text-sm text-gray-700">在 Tracker 记录进度 — 加入计划日期 + 当前状态</span></li>
+</ol><div class="bg-blue-50 border-blue-100 text-blue-600 border rounded-lg px-3 py-2 text-xs mt-2">📌 Brand Portal 登录入口： https://seller.walmart.com/brand-portal</div></div>
+    <div id="sop-tab-s2-bp-am" class="sop-tab-content-s2-bp hidden p-5"><div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">📞 电话 AM 标准话术</div><div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">“您好，请问是xx (公司名称或者运营人员名称)吗，我是您的沃尔玛客户经理[姓名]！我看了一下您目前的入驻进度，有一个事情想趁早跟您提——Brand Portal 品牌注册还没完成，这个建议14天内搞定，对您后续影响很大，我来跟您说说为什么。
+
+第一，内容权益保护。注册完之后，您的商品详情页内容会获得沃尔玛平台的优先排名权，而且只有您授权的人才能修改——其他卖家或者经销商没办法修改您listing的内容，您的品牌内容是受保护的。
+
+第二，解锁高级广告格式。Sponsored Brands、品牌旗舰店、视频广告这些高级广告位，没有完成品牌注册是用不了的。这些广告位都是在搞索结果顶部展示的，对新品冷启特别关键。
+
+第三，知识产权保护。如果您在沃尔玛发现了假冒或者侵权商品，注册完之后可以直接在Brand Portal一键举报，平台会自动处理保护您的品牌权益。
+
+流程不复杂，我现在可以把注册指引发给您。
+
+哎？近期还不打算做品牌备案吗？是遇到什么难处了吗
+(听取卖家回复)
+情况我都记下来了，我会去协助解决。咋们这几天保持沟通，争取早日完成品牌备案。</div><div class="mt-2 text-xs text-gray-400">[ ] 内容替换为实际信息</div></div>
+    <div id="sop-tab-s2-bp-wecom" class="sop-tab-content-s2-bp hidden p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-xs font-bold text-gray-500 uppercase tracking-wide">💬 WeCom 脚本</div>
+            <button class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-lg font-semibold hover:bg-green-200" onclick="copyWecom('wecom-text-s2-bp')">📋 Copy</button>
+          </div>
+          <div class="bg-[#f0f9eb] border border-green-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed font-mono" id="wecom-text-s2-bp">品牌店主注意啊 🚨
+
+咋们平台有个 Brand Portal 功能，就是给自有品牌卖家的专属“品牌旗舰店”。
+注册以后，您能拥有 👇
+
+🛡️ 品牌保护 — 自己的品牌页面可以管控，让競争对手无法搪用品牌名义卖假货
+🧠 品牌内容展示 — 自定义品牌页目，运营图片/公司介绍/特色商品展示，审美度大幅提升
+📢 广告副功能 — 解锁 WMC 更多广告格式，包括品牌广告 + 奖励联坥
+
+登录 Seller Center > Brand Portal > 点击圈子认证申请，10 分钟完成。
+有没有已经进行注册？有什么卡点我可以帮您 🙌</div>
+          <div class="mt-2 text-xs text-gray-400">绿色背景 = 可直接粘贴至 WeCom 发送</div>
+        </div>
+  </div>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+  <button onclick="toggleSOP('s2-wfs')" class="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition text-left">
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="text-xs font-bold bg-[#0c3f7f] text-white px-2 py-0.5 rounded">S2 · WFS</span>
+      <span class="font-semibold text-gray-800">📦 WFS 入库激活</span>
+      <span class="text-xs text-gray-400">· 上线后 21 天内完成</span>
+    </div>
+    <svg id="sop-arrow-s2-wfs" class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+  </button>
+  <div id="sop-body-s2-wfs" class="border-t border-gray-100">
+    <div class="flex gap-1 px-5 pt-4 pb-0">
+      <button onclick="sopTab('s2-wfs','steps')" id="stab-s2-wfs-steps" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-[#0053e2] text-[#0053e2] bg-white">📍 Steps</button>
+          <button onclick="sopTab('s2-wfs','am')" id="stab-s2-wfs-am" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">📞 AM 话术</button>
+          <button onclick="sopTab('s2-wfs','wecom')" id="stab-s2-wfs-wecom" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">💬 WeCom</button>
+          </div>
+    <div id="sop-tab-s2-wfs-steps" class="sop-tab-content-s2-wfs p-5"><ol class="space-y-2 mb-4"><li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span><span class="text-sm text-gray-700">确认卖家是否已创建 WFS Shipment（入库单）</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span><span class="text-sm text-gray-700">如否 → 介绍 WFS 正式入库流程 + 发送入库指引</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span><span class="text-sm text-gray-700">确认货物状态：PO Created / In Transit / Shipment Inbound / Received</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">4</span><span class="text-sm text-gray-700">如遇阻碞（包装/标签/通关）→ 记录具体阻碞并协助解决</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">5</span><span class="text-sm text-gray-700">在 Tracker 记录 WFS 状态 + 预计入库日期</span></li>
+</ol><div class="bg-blue-50 border-blue-100 text-blue-600 border rounded-lg px-3 py-2 text-xs mt-2">📌 统计: WFS 卖家 GMV 平均提升 50%</div></div>
+    <div id="sop-tab-s2-wfs-am" class="sop-tab-content-s2-wfs hidden p-5"><div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">📞 电话 AM 标准话术</div><div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">“您好，请问是xx (公司名称或者运营人员名称)，我是您的沃尔玛客户经理[姓名]，打扰您一下！
+
+我这边看了一下您的店铺情况，想跟您聊聊WFS——沃尔玛自营仓储配送服务，这个对您目前阶段影响挪大的，核心逻辑很简单：您把货发到沃尔玛仓库之后，拣货、打包、配送、退货、客服全部由沃尔玛来处理，您就专心做好备货和销售。WFS背后是沃尔玛全球最大供应链基础设施之一，这个能力不是一般第三方仓库能比的。
+
+最直接的好处是，商品会自动获得“两日达”和“沃尔玛配送”这两个标签，这两个标签在平台算法里面是有搞索排名加权的，转化率提升非常明显——官方数据显示，加入WFS之后GMV平均能提升50%。
+
+另外几个细节我也跟您说一下：一是费率在业内属于较低区间，性价比很高；二是库存没有上下限的限制，您可以根据自己的备货节奏灵活调整；三是如果您在其他平台也有销售，WFS还支持多渠道配送，一个仓库统一管理，效率高很多。
+
+流程不复杂，我现在可以把注册指引发给您。
+
+哎？近期还不打算做​WFS？是遇到什么难处了吗
+(听取卖家回复)
+情况我都记下来了，我会去协助解决。咋们这几天保持沟通，争取早日完成。
+
+同时，可以给卖家介绍沃尔玛头程服务（WI）：
+沃尔玛头程服务可以帮您顺利解决这些问题，助力您货到更快、成本更低！
+💰 一口价到WFS仓，ITS有专属收费上限，旺季不会坐地起价乱收费，成本完全可预测。供应链成本平均可节省 15%！
+⏱️ 船期稳定不压舱，卖家中心可直接查全程轨迹；LA的港到门平均时效 23 天！</div><div class="mt-2 text-xs text-gray-400">[ ] 内容替换为实际信息</div></div>
+    <div id="sop-tab-s2-wfs-wecom" class="sop-tab-content-s2-wfs hidden p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-xs font-bold text-gray-500 uppercase tracking-wide">💬 WeCom 脚本</div>
+            <button class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-lg font-semibold hover:bg-green-200" onclick="copyWecom('wecom-text-s2-wfs')">📋 Copy</button>
+          </div>
+          <div class="bg-[#f0f9eb] border border-green-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed font-mono" id="wecom-text-s2-wfs">还在自发货的卖家注意啊 🚨
+
+自发货这块有没有踩过坑？旺季爆单发不出去、退货客诉自己扈、买家投诉拉低账号健康......
+
+加入 WFS（沃尔玛自营仓储配送），让沃尔玛替您搞定一切！货发到仓，剩下的交给我们 💪📦
+
+📈 销量 — 带上"两日达"+"沃尔玛配送"双标签，搜索排名直接加权，GMV 平均提升 50%！
+💰 成本 — 费率业内较低区间，按重量计费，无隐藏费用，定价透明，旺季不乱涨！
+📦 省心 — 拣货、打包、配送、退货、客服，全部由沃尔玛负责，您只需专注备货和销售！
+
+📖 WFS 详情：https://marketplacelearn.walmart.com/guides/Walmart-Fulfillment-Services-%28WFS%29/Getting-started-with-WFS/wfs-overview</div>
+          <div class="mt-2 text-xs text-gray-400">绿色背景 = 可直接粘贴至 WeCom 发送</div>
+        </div>
+  </div>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+  <button onclick="toggleSOP('s2-wmc')" class="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition text-left">
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="text-xs font-bold bg-[#0c3f7f] text-white px-2 py-0.5 rounded">S2 · WMC</span>
+      <span class="font-semibold text-gray-800">📢 WMC 广告激活</span>
+      <span class="text-xs text-gray-400">· 上线后 30 天内开启广告</span>
+    </div>
+    <svg id="sop-arrow-s2-wmc" class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+  </button>
+  <div id="sop-body-s2-wmc" class="border-t border-gray-100">
+    <div class="flex gap-1 px-5 pt-4 pb-0">
+      <button onclick="sopTab('s2-wmc','steps')" id="stab-s2-wmc-steps" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-[#0053e2] text-[#0053e2] bg-white">📍 Steps</button>
+          <button onclick="sopTab('s2-wmc','am')" id="stab-s2-wmc-am" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">📞 AM 话术</button>
+          <button onclick="sopTab('s2-wmc','wecom')" id="stab-s2-wmc-wecom" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">💬 WeCom</button>
+          </div>
+    <div id="sop-tab-s2-wmc-steps" class="sop-tab-content-s2-wmc p-5"><ol class="space-y-2 mb-4"><li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span><span class="text-sm text-gray-700">确认卖家是否已激活 WMC 广告账户</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span><span class="text-sm text-gray-700">如否 → 介绍 WMC 三大广告格式：Sponsored Products / Brands / Videos</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span><span class="text-sm text-gray-700">建议先从 Auto Campaign 自动投放开始，设定简单，自动匹配关键词</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">4</span><span class="text-sm text-gray-700">确认广告预算和投放状态</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">5</span><span class="text-sm text-gray-700">在 Tracker 记录 WMC 状态</span></li>
+</ol><div class="bg-blue-50 border-blue-100 text-blue-600 border rounded-lg px-3 py-2 text-xs mt-2">📌 WFS + WMC 双剑合璧，效果翻倍</div></div>
+    <div id="sop-tab-s2-wmc-am" class="sop-tab-content-s2-wmc hidden p-5"><div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">📞 电话 AM 标准话术</div><div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">“您好，请问是xx (公司名称或者运营人员名称)，我是您的沃尔玛客户经理[姓名]！
+
+我这边看了一下您的店铺数据，我觉得有一个环节还有很大的提升空间——广告这块。我想跟您聊聊Walmart Connect（WMC），沃尔玛自己的广告平台。
+
+首先说一下规模，沃尔玛平台每个月有1.2亿+的活跃购物用户，这些用户是真正带着购买意图来的，跟社媒广告触达的泛流量完全不一样。WMC是CPC模式，只有消费者真正点击了您的广告才计费，不点不花錢。
+
+广告格式上也比较灵活：Sponsored Products是最基础的，搞索结果页、首页、购物车页都有展示位，新手上手很快；Sponsored Brands是搞索结果顶部的品牌广告位，曝光度最高，适合做品牌认知和竞品防守；如果您已经注册了Brand Portal，还可以免费搞建 Brand Shop品牌旗舰店，作为所有广告的落地页，完全不收费。
+
+另外跟您说一个组合逻辑——WFS帮您赞得流量入口，WMC帮您把流量转化成销量，两个工具联动效果最强。WFS卖家GMV平均已经能提升 50%，再叠加广告加持，效果会更加显著。
+
+我建议从自动投放 Auto Campaign 开始，设置简单，系统自动匹配关键词，适合刚起步的卖家。</div><div class="mt-2 text-xs text-gray-400">[ ] 内容替换为实际信息</div></div>
+    <div id="sop-tab-s2-wmc-wecom" class="sop-tab-content-s2-wmc hidden p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-xs font-bold text-gray-500 uppercase tracking-wide">💬 WeCom 脚本</div>
+            <button class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-lg font-semibold hover:bg-green-200" onclick="copyWecom('wecom-text-s2-wmc')">📋 Copy</button>
+          </div>
+          <div class="bg-[#f0f9eb] border border-green-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed font-mono" id="wecom-text-s2-wmc">还在只靠自然流量的卖家注意啊 🚨
+
+广告这块有没有这些烦恼？新品上架没曝光、竞争对手抢了您的关键词坑位、流量上不来转化也起不来……
+
+用 Walmart Connect（WMC），让沃尔玛的 1.2亿+月活用户 主动找到您！🎯
+
+💰 CPC 模式，点了才收费 —— 消费者没点击广告？一分錢不扣！只为真实的高意向流量买单，比社媒烧錢效率高多了
+🔝 Sponsored Products —— 覆盖搜索页、首页、购物车页多个黄金展位，系统自动匹配关键词，新手也能快速上手
+👑 Sponsored Brands —— 搜索结果顶部品牌广告位，全站最高曝光度，一次展示品牌 Logo + 4个商品链接，竞品抗不走！
+🎬 Sponsored Videos —— 视频广告格式，新品冷启动、品牌故事讲透，消费者看完直接转化
+🏪 Brand Shop 品牌旗舰店 —— 完全 免费！品牌专属店铺页面，SEO 加权，还能作为所有广告的统一落地页
+📈 WFS + WMC 双剑合璧 —— WFS 帮您赢得流量入口，WMC 帮您把流量转化成销量！WFS 卖家 GMV 平均提升 50%，再叠加广告加持，效果翻倍！
+
+有兴趣了解一下吗？👇
+
+📖 WMC 广告总览：<a href="https://marketplacelearn.walmart.com/guides/Advertising/Overview/walmart-connect-advertising-solutions-overview" target="_blank" class="text-[#0053e2] underline hover:text-[#003da8] break-all">https://marketplacelearn.walmart.com/guides/Advertising/Overview/walmart-connect-advertising-solutions-overview</a>
+🎯 Sponsored Products：<a href="https://marketplacelearn.walmart.com/guides/Advertising/Search/sponsored-products-overview" target="_blank" class="text-[#0053e2] underline hover:text-[#003da8] break-all">https://marketplacelearn.walmart.com/guides/Advertising/Search/sponsored-products-overview</a>
+👑 Sponsored Brands：<a href="https://marketplacelearn.walmart.com/guides/Advertising/Search/sponsored-brands-overview" target="_blank" class="text-[#0053e2] underline hover:text-[#003da8] break-all">https://marketplacelearn.walmart.com/guides/Advertising/Search/sponsored-brands-overview</a>
+🏪 Brand Shop：<a href="https://marketplacelearn.walmart.com/guides/Advertising/Sales/brand-shop" target="_blank" class="text-[#0053e2] underline hover:text-[#003da8] break-all">https://marketplacelearn.walmart.com/guides/Advertising/Sales/brand-shop</a>
+🚀 广告入门指引：<a href="https://marketplacelearn.walmart.com/guides/Advertising/Overview/getting-started-with-walmart-connect" target="_blank" class="text-[#0053e2] underline hover:text-[#003da8] break-all">https://marketplacelearn.walmart.com/guides/Advertising/Overview/getting-started-with-walmart-connect</a></div>
+          <div class="mt-2 text-xs text-gray-400">绿色背景 = 可直接粘贴至 WeCom 发送</div>
+        </div>
+  </div>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+  <button onclick="toggleSOP('s2-cq')" class="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition text-left">
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="text-xs font-bold bg-[#0c3f7f] text-white px-2 py-0.5 rounded">S2 · CQ</span>
+      <span class="font-semibold text-gray-800">⭐ Content Quality 内容评分</span>
+      <span class="text-xs text-gray-400">· 目标： CQ ≥ 70 分</span>
+    </div>
+    <svg id="sop-arrow-s2-cq" class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+  </button>
+  <div id="sop-body-s2-cq" class="border-t border-gray-100">
+    <div class="flex gap-1 px-5 pt-4 pb-0">
+      <button onclick="sopTab('s2-cq','steps')" id="stab-s2-cq-steps" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-[#0053e2] text-[#0053e2] bg-white">📍 Steps</button>
+          <button onclick="sopTab('s2-cq','am')" id="stab-s2-cq-am" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">📞 AM 话术</button>
+          <button onclick="sopTab('s2-cq','wecom')" id="stab-s2-cq-wecom" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">💬 WeCom</button>
+          </div>
+    <div id="sop-tab-s2-cq-steps" class="sop-tab-content-s2-cq p-5"><ol class="space-y-2 mb-4"><li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span><span class="text-sm text-gray-700">在 Seller Center > Listing Quality Dashboard 查看评分</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span><span class="text-sm text-gray-700">优先修复评分最低的 SKU</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span><span class="text-sm text-gray-700">检查标题：品牌+型号+品类+核心属性，去掉全大写和促销词</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">4</span><span class="text-sm text-gray-700">主图升级到 1000px 以上白底，追加多角度图（建议 4 张以上）</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-[#0c3f7f] text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">5</span><span class="text-sm text-gray-700">按优先级修改每个 SKU 具体扣分项，内容更新后 1–7 天内评分刷新</span></li>
+</ol><div class="bg-blue-50 border-blue-100 text-blue-600 border rounded-lg px-3 py-2 text-xs mt-2">📌 CQ ≥ 70 分 = Perfect Launch 必要条件之一</div></div>
+    <div id="sop-tab-s2-cq-am" class="sop-tab-content-s2-cq hidden p-5"><div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">📞 电话 AM 标准话术</div><div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">“您好，请问是xx (公司名称或者运营人员名称)吗，我是您的沃尔玛客户经理[姓名]！
+
+我这边帮您看了一下店铺里的商品数据，有一个比较关键的指标想跟您说——Content Score 内容质量评分，目前您有一些 SKU 还没有达到 70 分，这个分数对您在平台上的搞索排名和转化影响比较大，我想帮您一起把它提上去。
+
+沃尔玛平台的内容质量分是 0 到 100 分，70 分以上才算“良好”，搞索排名会明显非前，消费者看到您商品的机会也更多。这个分数主要由四个部分组成：标题、图片、商品描述、产品属性。其中标题和图片是权重最高的两个要素，这两块做好了基本上内容分就能提升很大一截。
+
+好消息是，卖家中心里有一个 Listing Quality Dashboard，可以直接看到每个商品的评分、哪里扣分了、该怎么改，系统会给出具体建议，不用自己猜。内容更新之后通常 1 到 7 天内评分就会刷新。</div><div class="mt-2 text-xs text-gray-400">[ ] 内容替换为实际信息</div></div>
+    <div id="sop-tab-s2-cq-wecom" class="sop-tab-content-s2-cq hidden p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-xs font-bold text-gray-500 uppercase tracking-wide">💬 WeCom 脚本</div>
+            <button class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-lg font-semibold hover:bg-green-200" onclick="copyWecom('wecom-text-s2-cq')">📋 Copy</button>
+          </div>
+          <div class="bg-[#f0f9eb] border border-green-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed font-mono" id="wecom-text-s2-cq">Listing 内容分还没到 70 分的卖家注意啊 🚨
+
+Content Score 达到 70 分，平台搜索排名直接提升，消费者才能更容易找到您！
+
+📝 商品标题 — 权重最高！格式：品牌+型号+品类+核心属性
+📷 商品图片 — 权重最高！主图 ≥ 1000px 白底，建议 4 张以上
+
+❤️ 内容更新后 1–7 天内评分刷新
+
+📊 Listing Quality Dashboard：https://seller.walmart.com/growth/listing-quality</div>
+          <div class="mt-2 text-xs text-gray-400">绿色背景 = 可直接粘贴至 WeCom 发送</div>
+        </div>
+  </div>
+</div>
+</div></div>
+  </div>
+  <!-- S3 SOP -->
+  <div id="sp-tab-s3" class="hidden border border-[#1a2e4a] rounded-b-xl rounded-tr-xl bg-white overflow-hidden">
+    <div class="px-6 py-4" style="background:linear-gradient(135deg,#1a2e4a,#2d3748);">
+    <div class="text-white font-bold text-base">S3 &middot; Seller Quality</div>
+    <div class="text-blue-200 text-xs mt-0.5">Suspension &amp; Termination Management</div>
+  </div>
+    <div class="p-4 space-y-3"><div id="ssub-content-s3-sop" class="p-4 space-y-3">
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+  <button onclick="toggleSOP('s3-presuspend')" class="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition text-left">
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="text-xs font-bold bg-yellow-600 text-white px-2 py-0.5 rounded">S3 · Pre-Suspend</span>
+      <span class="font-semibold text-gray-800">⚠️ Pre-Suspend Alert 预警</span>
+      <span class="text-xs text-gray-400">· As Triggered · 一周内完成case的处理</span>
+    </div>
+    <svg id="sop-arrow-s3-presuspend" class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+  </button>
+  <div id="sop-body-s3-presuspend" class="border-t border-gray-100">
+    <div class="flex gap-1 px-5 pt-4 pb-0">
+      <button onclick="sopTab('s3-presuspend','steps')" id="stab-s3-presuspend-steps" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-[#0053e2] text-[#0053e2] bg-white">📍 Steps</button>
+          <button onclick="sopTab('s3-presuspend','am')" id="stab-s3-presuspend-am" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">📞 AM 话术</button>
+          </div>
+    <div id="sop-tab-s3-presuspend-steps" class="sop-tab-content-s3-presuspend p-5"><ol class="space-y-2 mb-4"><li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-yellow-600 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span><span class="text-sm text-gray-700">确认账号异常类型和具体问题代码</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-yellow-600 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span><span class="text-sm text-gray-700">当天联系卖家告知问题和整改要求</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-yellow-600 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span><span class="text-sm text-gray-700">确认卖家是否知情，记录回复</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-yellow-600 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">4</span><span class="text-sm text-gray-700">告知单次整改 deadline（通常 X 个工作日）</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-yellow-600 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">5</span><span class="text-sm text-gray-700">在 Tracker 记录：问题类型 / 卖家知情情况 / 预计整改时间</span></li>
+</ol><div class="bg-blue-50 border-blue-100 text-blue-600 border rounded-lg px-3 py-2 text-xs mt-2">📝 需记录：问题类型 / 卖家知情情况 / 预计整改时间 / POA 提交 deadline</div></div>
+    <div id="sop-tab-s3-presuspend-am" class="sop-tab-content-s3-presuspend hidden p-5"><div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">📞 电话 AM 标准话术</div><div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">"您好，请问是 xx（公司名称或者运营人员名称）吗，我是您的沃尔玛客户经理[姓名]！
+
+有一件比较紧急的事情需要跟您说一下。
+
+我们这边系统检测到您的账号目前存在 [xxx 问题]，如果这个问题没有及时处理，可能会影响到您账号的正常运营状态，严重的话会导致账号被暫停。
+
+我需要请您尽快针对 [xxx 问题] 采取对应的整改行动。
+
+我想先了解一下，您这边是否已经知道这个问题了？目前大概是什么情况？
+
+（记录卖家反馈）好的，我这边记录一下。建议您 [X 个工作日] 内完成整改，避免账号状态受影响。有任何不清楚的地方我可以继续帮您。"</div><div class="mt-2 text-xs text-gray-400">[ ] 内容替换为实际信息</div></div>
+    
+  </div>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+  <button onclick="toggleSOP('s3-infringement')" class="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition text-left">
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="text-xs font-bold bg-red-700 text-white px-2 py-0.5 rounded">S3 · 侵权</span>
+      <span class="font-semibold text-gray-800">⚠️ 侵权投诉处理 (IP Infringement)</span>
+      <span class="text-xs text-gray-400">· As Triggered · 一周内完成case的处理</span>
+    </div>
+    <svg id="sop-arrow-s3-infringement" class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+  </button>
+  <div id="sop-body-s3-infringement" class="border-t border-gray-100">
+    <div class="flex gap-1 px-5 pt-4 pb-0">
+      <button onclick="sopTab('s3-infringement','steps')" id="stab-s3-infringement-steps" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-[#0053e2] text-[#0053e2] bg-white">📍 Steps</button>
+          <button onclick="sopTab('s3-infringement','am')" id="stab-s3-infringement-am" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">📞 AM 话术</button>
+          </div>
+    <div id="sop-tab-s3-infringement-steps" class="sop-tab-content-s3-infringement p-5"><ol class="space-y-2 mb-4"><li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-red-700 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span><span class="text-sm text-gray-700">确认侵权产品 / 侵权类型（商标/版权/专利）</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-red-700 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span><span class="text-sm text-gray-700">要求卖家在规定时间内下架侵权产品</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-red-700 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span><span class="text-sm text-gray-700">询问供应商信息及是否有正规授权文件</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-red-700 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">4</span><span class="text-sm text-gray-700">如卖家认为是误判，协助走申诉流程</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-red-700 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">5</span><span class="text-sm text-gray-700">在 Tracker 记录：侵权产品 / 类型 / 下架 deadline / 申诉状态</span></li>
+</ol><div class="bg-red-50 border-red-100 text-red-600 border rounded-lg px-3 py-2 text-xs mt-2">⚠️ 超时未下架 → 账号可能被暫停，立即升级处理</div></div>
+    <div id="sop-tab-s3-infringement-am" class="sop-tab-content-s3-infringement hidden p-5"><div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">📞 电话 AM 标准话术</div><div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">"您好，请问是 xx（公司名称或者运营人员名称）吗，我是您的沃尔玛客户经理[姓名]！
+
+有一件很紧急的事情需要马上跟您沟通。
+
+我们收到了一个关于您店铺的侵权投诉，具体涉及的是 [xxx 产品/SKU]，被认定为涉嫌 [商标侵权/版权侵权/专利侵权]。这个问题目前非常紧迫，需要您在 [xx 小时] 内将这个商品下架处理，否则会影响到整个账号的状态。"</div><div class="mt-2 text-xs text-gray-400">[ ] 内容替换为实际信息</div></div>
+    
+  </div>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+  <button onclick="toggleSOP('s3-suspended')" class="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition text-left">
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="text-xs font-bold bg-red-800 text-white px-2 py-0.5 rounded">S3 · Suspended</span>
+      <span class="font-semibold text-gray-800">🔴 Suspended 账号暫停</span>
+      <span class="text-xs text-gray-400">· As Triggered · 当天联系 + 1 天内提交 POA</span>
+    </div>
+    <svg id="sop-arrow-s3-suspended" class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+  </button>
+  <div id="sop-body-s3-suspended" class="border-t border-gray-100">
+    <div class="flex gap-1 px-5 pt-4 pb-0">
+      <button onclick="sopTab('s3-suspended','steps')" id="stab-s3-suspended-steps" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-[#0053e2] text-[#0053e2] bg-white">📍 Steps</button>
+          <button onclick="sopTab('s3-suspended','am')" id="stab-s3-suspended-am" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">📞 AM 话术</button>
+          </div>
+    <div id="sop-tab-s3-suspended-steps" class="sop-tab-content-s3-suspended p-5"><ol class="space-y-2 mb-4"><li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-red-800 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span><span class="text-sm text-gray-700">确认 Suspend 状态和官方原因代码</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-red-800 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span><span class="text-sm text-gray-700">当天联系卖家，告知被暫停原因</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-red-800 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span><span class="text-sm text-gray-700">了解卖家自述情况和可能的错误操作</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-red-800 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">4</span><span class="text-sm text-gray-700">要求 1 天内准备并提交 POA（根本原因 / 已采取措施 / 预防方案）</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-red-800 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">5</span><span class="text-sm text-gray-700">在 Tracker 记录：Suspend 原因代码 / 卖家解释 / POA deadline / 提交状态</span></li>
+</ol><div class="bg-red-50 border-red-100 text-red-600 border rounded-lg px-3 py-2 text-xs mt-2">📝 需记录：Suspend 原因代码 / 卖家解释 / POA deadline（1天）/ 提交状态</div></div>
+    <div id="sop-tab-s3-suspended-am" class="sop-tab-content-s3-suspended hidden p-5"><div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">📞 电话 AM 标准话术</div><div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">"您好，请问是 xx（公司名称或者运营人员名称）吗，我是您的沃尔玛客户经理[姓名]！
+
+您的账号目前已经被暫停（Suspended），暫停的原因是 [xxx]。我知道这个消息会让您比较着急，所以我第一时间联系您，想帮您尽快把这个问题解决掉。
+
+接下来最关键的一步是：请您在 1 天内准备好 POA（Plan of Action 整改方案）并提交申诉。POA 需要包含三个部分：
+第一，问题的根本原因是什么；
+第二，您已经采取了哪些具体措施；
+第三，后续如何防止同样问题再次发生。"</div><div class="mt-2 text-xs text-gray-400">[ ] 内容替换为实际信息</div></div>
+    
+  </div>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+  <button onclick="toggleSOP('s3-terminated')" class="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition text-left">
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="text-xs font-bold bg-gray-800 text-white px-2 py-0.5 rounded">S3 · Terminated</span>
+      <span class="font-semibold text-gray-800">🚫 Terminated 账号终止</span>
+      <span class="text-xs text-gray-400">· As Triggered · 了解终止原因 + 记录复盘</span>
+    </div>
+    <svg id="sop-arrow-s3-terminated" class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+  </button>
+  <div id="sop-body-s3-terminated" class="border-t border-gray-100">
+    <div class="flex gap-1 px-5 pt-4 pb-0">
+      <button onclick="sopTab('s3-terminated','steps')" id="stab-s3-terminated-steps" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-[#0053e2] text-[#0053e2] bg-white">📍 Steps</button>
+          <button onclick="sopTab('s3-terminated','am')" id="stab-s3-terminated-am" class="text-xs px-3 py-1.5 rounded-t-lg font-semibold border-b-2 border-transparent text-gray-400 bg-gray-50 hover:bg-gray-100">📞 AM 话术</button>
+          </div>
+    <div id="sop-tab-s3-terminated-steps" class="sop-tab-content-s3-terminated p-5"><ol class="space-y-2 mb-4"><li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-gray-700 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span><span class="text-sm text-gray-700">确认 Terminated 状态和官方原因代码</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-gray-700 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span><span class="text-sm text-gray-700">当天联系卖家，了解卖家自述的真实原因</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-gray-700 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span><span class="text-sm text-gray-700">深度追问：是运营问题、供应链问题，还是其他因素？</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-gray-700 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">4</span><span class="text-sm text-gray-700">记录卖家自述原因 + 关键决策节点（复盘用）</span></li>
+<li class="flex gap-2"><span class="w-5 h-5 rounded-full bg-gray-700 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">5</span><span class="text-sm text-gray-700">在 Tracker 更新：官方 termination 原因 + 卖家真实原因 + 结案</span></li>
+</ol><div class="bg-gray-100 border-gray-200 text-gray-600 border rounded-lg px-3 py-2 text-xs mt-2">📝 复盘价值：Terminated 案例是团队学习最宝贵的素材，务必完整记录</div></div>
+    <div id="sop-tab-s3-terminated-am" class="sop-tab-content-s3-terminated hidden p-5"><div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">📞 电话 AM 标准话术</div><div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">"您好，请问是 xx（公司名称或者运营人员名称）吗，我是您的沃尔玛客户经理[姓名]！
+
+您的账号目前已经是 Terminated 的状态了，我今天联系您，想了解一下，具体是什么情况导致了 terminate？
+
+（停顿，给卖家空间说话）
+
+（如果卖家说官方原因，追问）好的，我理解。但我更想听的是您自己的理解——您觉得这个问题最开始是怎么发生的？是运营上的问题、供应链、还是有其他因素？
+
+好的，这些对我们来说非常有价值，我会如实记录下来。"</div><div class="mt-2 text-xs text-gray-400">[ ] 内容替换为实际信息</div></div>
+    
+  </div>
+</div>
+</div></div>
+  </div>
+</section>
+</div>
+</div>
+
+<footer class="bg-[#0053e2] text-blue-200 text-xs text-center py-3 mt-10">
+  Walmart Marketplace &middot; BD Team Seller Journey Dashboard &middot; Internal Use Only
+</footer>
+<div id="edit-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-6 py-4 border-b sticky top-0 bg-white z-10">
+      <h3 class="font-bold text-gray-800 text-base" id="modal-title">Record</h3>
+      <button onclick="closeModal()" class="text-gray-400 hover:text-gray-700 text-xl">X</button>
+    </div>
+    <div id="modal-body" class="p-6"></div>
+  </div>
+</div>
+
+<script>
+const INSIGHTS = {"s1":{"total":4,"due_today":0,"stages":{"BV Submission":2,"Go-Live":2},"contacted":{"Yes":4},"statuses":{"In Progress":1,"Submitted":3},"attempts":{"2":1,"3":2,"4":1}},"s2":{"total":3,"due_today":0,"first_sale":{"Not Yet":2,"Yes":1},"brand_portal":{"Applied":1,"Not Started":1,"Registered":1},"wmc_status":{"Campaign Live":1,"Not Activated":2},"wfs_status":{"In Transit":1,"PO Created":1,"Shipment Inbound":1},"pl_scores":{"0/4":1,"1/4":1,"4/4":1},"day_buckets":{"Day 1-30":3,"Day 31-60":0,"Day 61-90":0,"Day 90+":0}},"s3":{"total":2,"due_today":0,"quality_type":{"Suspended":1,"Terminated":1},"reason_codes":{"SQ-02":1,"TM-03":1},"remediation":{"Closed":1,"In Progress":1}}};
+
+// Dashboard modal (S2 / S3 edit buttons)
+function openModal(title, html) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('edit-modal').classList.remove('hidden');
+  if (typeof htmx !== 'undefined') htmx.process(document.getElementById('modal-body'));
+}
+function closeModal() {
+  document.getElementById('edit-modal').classList.add('hidden');
+}
+document.getElementById('edit-modal').addEventListener('click', function(e) {
+  if (e.target === e.currentTarget) closeModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+// Insights tab switch
+let activeInsightStage = 's1';
+const INS_ACTIVE_COLOR = {
+  s1: 'bg-[#0053e2] border-[#0053e2]',
+  s2: 'bg-[#0c3f7f] border-[#0c3f7f]',
+  s3: 'bg-[#1a2e4a] border-[#1a2e4a]'
+};
+function switchInsightTab(name) {
+  activeInsightStage = name;
+  ['s1','s2','s3'].forEach(function(t) {
+    var p = document.getElementById('ins-tab-'+t);
+    if (p) p.classList.add('hidden');
+    var btn = document.getElementById('ins-btn-'+t);
+    if (btn) btn.className = 'ins-tab-btn px-5 py-2 text-sm font-semibold bg-white text-gray-500 border border-gray-300 border-l-0'
+      + (t === 's1' ? ' rounded-tl-xl' : '') + (t === 's3' ? ' rounded-tr-xl' : '');
+  });
+  var ap = document.getElementById('ins-tab-'+name);
+  if (ap) ap.classList.remove('hidden');
+  var ab = document.getElementById('ins-btn-'+name);
+  if (ab) ab.className = 'ins-tab-btn px-5 py-2 text-sm font-semibold text-white border '
+    + INS_ACTIVE_COLOR[name]
+    + (name === 's1' ? ' rounded-tl-xl' : '') + (name === 's3' ? ' rounded-tr-xl' : '');
+}
+
+// Tracker section tab switch
+let activeStage = 's1';
+function switchTab(name) {
+  activeStage = name;
+  ['s1','s2','s3'].forEach(function(t) {
+    document.getElementById('tab-'+t).classList.add('hidden');
+    document.getElementById('btn-'+t).className =
+      'tracker-tab px-5 py-2.5 text-sm font-semibold bg-white text-gray-500 border border-gray-300 border-l-0';
+  });
+  document.getElementById('tab-'+name).classList.remove('hidden');
+  document.getElementById('btn-'+name).className =
+    'tracker-tab px-5 py-2.5 text-sm font-semibold bg-[#0053e2] text-white border border-[#0053e2]';
+  document.getElementById('btn-s1').classList.add('rounded-tl-xl');
+  document.getElementById('btn-s3').classList.add('rounded-tr-xl');
+}
+
+function navOpenSOP() { setTimeout(function() { stageSubTab(activeStage,'sop'); }, 80); }
+
+const SSUB_ACTIVE   = 'text-xs px-4 py-1.5 rounded-full font-semibold bg-[#0053e2] text-white shadow-sm';
+const SSUB_INACTIVE = 'text-xs px-4 py-1.5 rounded-full font-semibold bg-white text-gray-500 border border-gray-300 hover:border-purple-400 hover:text-purple-600';
+
+function stageSubTab(stage, tab) {
+  ['tracker','sop'].forEach(function(t) {
+    var c = document.getElementById('ssub-content-'+stage+'-'+t);
+    if (c) c.classList.add('hidden');
+    var btn = document.getElementById('ssub-'+stage+'-'+t);
+    if (btn) btn.className = SSUB_INACTIVE;
+  });
+  var sc = document.getElementById('ssub-content-'+stage+'-'+tab);
+  if (sc) sc.classList.remove('hidden');
+  var ab = document.getElementById('ssub-'+stage+'-'+tab);
+  if (ab) ab.className = SSUB_ACTIVE;
+}
+
+function toggleSOP(id) {
+  document.getElementById('sop-body-'+id).classList.toggle('hidden');
+  document.getElementById('sop-arrow-'+id).classList.toggle('rotate-180');
+}
+
+function sopTab(id, tab) {
+  document.querySelectorAll('.sop-tab-content-'+id).forEach(function(el) { el.classList.add('hidden'); });
+  ['steps','am','wecom'].forEach(function(t) {
+    var btn = document.getElementById('stab-'+id+'-'+t);
+    if (btn) {
+      btn.classList.remove('border-[#0053e2]','text-[#0053e2]','bg-white');
+      btn.classList.add('border-transparent','text-gray-400','bg-gray-50');
+    }
+  });
+  var sc = document.getElementById('sop-tab-'+id+'-'+tab);
+  if (sc) sc.classList.remove('hidden');
+  var ab = document.getElementById('stab-'+id+'-'+tab);
+  if (ab) {
+    ab.classList.add('border-[#0053e2]','text-[#0053e2]','bg-white');
+    ab.classList.remove('border-transparent','text-gray-400','bg-gray-50');
+  }
+}
+
+function copyWecom(elId) {
+  var el = document.getElementById(elId);
+  if (!el) return;
+  navigator.clipboard.writeText(el.innerText).then(function() {
+    var btn = el.parentElement.querySelector('button[onclick*="copyWecom"]');
+    if (btn) { var o = btn.textContent; btn.textContent = 'Copied!'; setTimeout(function() { btn.textContent = o; }, 1500); }
+  });
+}
+
+function openAddS2() { openModal('Add S2 Record','<p class="text-gray-500 text-sm">Connect to backend.</p>'); }
+function openAddS3() { openModal('Add S3 Record','<p class="text-gray-500 text-sm">Connect to backend.</p>'); }
+
+// Charts
+(function() {
+  var D = INSIGHTS, S1 = D.s1, S2 = D.s2, S3 = D.s3;
+  var BLUE='#0053e2', GREEN='#2a8703', RED='#ea1100', GOLD='#ffc220', GRAY='#6b7280',
+      NAVY='#0c3f7f', ORANGE='#f97316', TEAL='#0d9488', PURPLE='#7c3aed';
+  var PAL = [BLUE, GREEN, RED, GOLD, GRAY, NAVY, ORANGE, TEAL, PURPLE];
+
+  function doughnut(id, labels, data) {
+    var el = document.getElementById(id); if (!el) return;
+    try { new Chart(el, { type:'doughnut', data:{labels:labels, datasets:[{data:data, backgroundColor:PAL.slice(0,labels.length), borderWidth:2, borderColor:'#fff'}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{font:{size:10}, boxWidth:10, padding:8}}}}}); } catch(e) {}
+  }
+  function bar(id, labels, data, color) {
+    var el = document.getElementById(id); if (!el) return;
+    try { new Chart(el, { type:'bar', data:{labels:labels, datasets:[{data:data, backgroundColor:color||PAL.slice(0,labels.length), borderRadius:5, borderSkipped:false}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{beginAtZero:true}}}}); } catch(e) {}
+  }
+
+  document.getElementById('si-total-num').textContent     = S1.total;
+  document.getElementById('si-contacted-num').textContent = S1.contacted['Yes'] || 0;
+  document.getElementById('si-due-num').textContent       = S1.due_today;
+  document.getElementById('si-pending-num').textContent   = S1.contacted['No']  || 0;
+  document.getElementById('s1-kpi-total-badge').textContent = 'Total ' + S1.total;
+  document.getElementById('s1-kpi-due-badge').textContent   = S1.due_today + ' due today';
+  bar('c-s1-stage',   Object.keys(S1.stages),   Object.values(S1.stages),   BLUE);
+  doughnut('c-s1-status',  Object.keys(S1.statuses), Object.values(S1.statuses));
+  bar('c-s1-attempts', Object.keys(S1.attempts).map(function(k){return k+' attempts';}), Object.values(S1.attempts), NAVY);
+
+  document.getElementById('s2-total-num').textContent      = S2.total;
+  document.getElementById('s2-firstsale-num').textContent  = S2.first_sale['Yes'] || 0;
+  document.getElementById('s2-due-num').textContent        = S2.due_today;
+  document.getElementById('s2-90plus-num').textContent     = S2.day_buckets['Day 90+'] || 0;
+  document.getElementById('s2-kpi-total-badge').textContent = 'Total ' + S2.total;
+  document.getElementById('s2-kpi-due-badge').textContent   = S2.due_today + ' due today';
+  bar('c-s2-days', Object.keys(S2.day_buckets), Object.values(S2.day_buckets), [GREEN,GOLD,ORANGE,RED]);
+  doughnut('c-s2-fs',  Object.keys(S2.first_sale),   Object.values(S2.first_sale));
+  doughnut('c-s2-wmc', Object.keys(S2.wmc_status),   Object.values(S2.wmc_status));
+  doughnut('c-s2-bp',  Object.keys(S2.brand_portal),  Object.values(S2.brand_portal));
+
+  document.getElementById('s3-total-num').textContent       = S3.total;
+  document.getElementById('s3-suspended-num').textContent   = S3.quality_type['Suspended']  || 0;
+  document.getElementById('s3-terminated-num').textContent  = S3.quality_type['Terminated'] || 0;
+  document.getElementById('s3-due-num').textContent         = S3.due_today;
+  document.getElementById('s3-kpi-total-badge').textContent = 'Total ' + S3.total;
+  document.getElementById('s3-kpi-due-badge').textContent   = S3.due_today + ' due today';
+  doughnut('c-s3-type',  Object.keys(S3.quality_type),  Object.values(S3.quality_type));
+  bar('c-s3-codes',      Object.keys(S3.reason_codes),  Object.values(S3.reason_codes));
+  doughnut('c-s3-remed', Object.keys(S3.remediation),   Object.values(S3.remediation));
+})();
+</script>
+
+<script>
+// ── sidebar page navigation ─────────────────────────────────────────
+const PAGE_META = {
+  mechanism: { icon:'&#x2699;&#xFE0F;', title:'Mechanism — Seller Journey Pipeline' },
+  insights:  { icon:'&#x1F4CA;',        title:'Insights Dashboard' },
+  tracker:   { icon:'&#x1F4CB;',        title:'Tracker — Seller Lists' },
+  sop:       { icon:'&#x1F4D6;',        title:'SOP &amp; 话术' },
+};
+
+function showPage(id) {
+  Object.keys(PAGE_META).forEach(p => {
+    document.getElementById('page-' + p).classList.toggle('hidden', p !== id);
+    const btn = document.getElementById('nav-' + p);
+    btn.classList.toggle('active', p === id);
+    btn.setAttribute('aria-current', p === id ? 'page' : 'false');
+  });
+
+
+  // lazy-load insights iframe on first visit
+  if (id === 'insights') {
+    const iframe = document.querySelector('#page-insights iframe[data-src]');
+    if (iframe && iframe.src.includes('about:blank')) {
+      iframe.src = iframe.getAttribute('data-src');
+    }
+  }
+  history.replaceState(null, '', '#' + id);
+}
+
+// honour #hash on load
+document.addEventListener('DOMContentLoaded', function() {
+  const hash = location.hash.replace('#', '');
+  if (PAGE_META[hash]) showPage(hash);
+});
+</script>
+
+
+<script>
+// ── generic stage tab switcher (prefix = 'tk' or 'sp') ──
+function switchStage(prefix, stage) {
+  ['s1','s2','s3'].forEach(function(s) {
+    var panel = document.getElementById(prefix + '-tab-' + s);
+    var btn   = document.getElementById(prefix + '-btn-' + s);
+    var active = (s === stage);
+    panel.classList.toggle('hidden', !active);
+    if (active) {
+      btn.classList.add('bg-[#0053e2]','text-white','border-[#0053e2]');
+      btn.classList.remove('bg-white','text-gray-500','border-gray-300');
+    } else {
+      btn.classList.remove('bg-[#0053e2]','text-white','border-[#0053e2]');
+      btn.classList.add('bg-white','text-gray-500','border-gray-300');
+    }
+  });
+}
+</script>
+</body>
+</html>
